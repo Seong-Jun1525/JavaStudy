@@ -327,3 +327,75 @@ int add(int n1, int n2) {
 - 메서드를 구현함으로써 객체의 기능이 구현됨
 - 메서드의 이름은 그 객체를 사용하는 객체에 맞게 짓는것이 좋음
 
+## 객체 속성은 멤버 변수로, 객체의 기능은 메서드로 구현
+- 클래스를 기반으로 여러개의 인스턴스가 생성될 수 있다.
+
+### student
+```java
+public class Student {
+	public int studentID;
+	public String studentName;
+	public String address;
+	
+	public void showStudentInfo() {
+		System.out.println(studentID + "학번 학생의 이름은 " + studentName + "이고, 주소는 " + address + "입니다.");
+	}
+	
+	public String getStudentName() {
+		return studentName;
+	}
+	
+	public void setStudentName(String name) {
+		studentName = name;
+	}
+}
+```
+### studentTest
+```java
+public class StudentTest {
+
+	public static void main(String[] args) {
+		Student studentLim = new Student();
+		
+		studentLim.studentID = 201907012;
+		studentLim.setStudentName("Seong Jun");
+		studentLim.address = "인천";
+		
+		studentLim.showStudentInfo();
+		
+		Student studentWoo = new Student();
+		
+		studentWoo.studentID = 10241028;
+		studentWoo.setStudentName("Woo");
+		studentWoo.address = "인천";
+		
+		studentWoo.showStudentInfo();
+	}
+
+}
+```
+
+## 인스턴스 생성과 힙 메모리
+### 인스턴스
+- 클래스는 객체의 속성을 정의하고, 기능을 구현하여 만들어 놓은 코드 상태
+- 실제 클래스 기반으로 생성된 객체(인스턴스)는 각각 다른 멤버 변수 값을 가지게 됨
+- 학생의 클래스에서 생성된 각각의 인스턴스는 각각 다른 이름, 학번, 학년등의 값을 가지게 됨
+- new 키워드를 사용하여 인스턴스 생성
+
+### 힙 메모리
+- 생성된 인스턴스는 동적 메모리(힙 메모리)에 할당됨
+- C나 C++에서는 사용한 동적 메모리를 프로그래머가 해제 시켜야함(free(), delete())
+- Java에서 Gabage Collector가 주기적으로 사용하지 않는 메모리를 수거
+- 하나의 클래스로 부터 여러개의 인스턴스가 생성되고 각각 다른 메모리 주소를 가지게 됨
+
+### 용어 정리
+용어 | 설명
+-- | --
+객체 | 객체 지향 프로그램의 대상, 생성된 인스턴스
+클래스 | 객체를 프로그래밍 하기 위해 코드로 정의해 놓은 상태
+인스턴스 | new 키워드를 사용하여 클래스를 메모리에 생성한 상태
+멤버 변수 | 클래스의 속성, 특성
+메서드 | 멤버 변수를 이용하여 클래스의 기능을 구현한 함수
+참조 변수 | 메모리에 생성된 인스턴스를 가리키는 변수
+참조 값 | 생성된 인스턴스의 메모리 주소 값
+
