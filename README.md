@@ -464,3 +464,74 @@ public class UserInfoTest {
 	}
 }
 ```
+
+## 참조 자료형 변수
+### 참조 자료형
+- 변수의 자료형
+	- 기본 자료형 : int, float, double, long 등
+	- 참조 자료형 : String, Date Student 등
+- 클래스 형으로 변수를 선언
+- 기본 자료형은 사용하는 메모리 크기가 정해져 있지만, 참조 자료형은 클래스에따라 다름
+- 참조 자료형을 사용 할때는 해당 변수에 대해 생성하여야 함(String 클래스는 예외적으로 생성하지 않고 사용할 수 있음)
+
+### 참조 자료형 정의하여 사용하기
+- Student
+```java
+public class Student {
+	int studentId;
+	String studentName;
+	Subject korean;
+	Subject math;
+	
+	public Student(int id, String name) {
+		studentId = id;
+		studentName = name;
+		
+		korean = new Subject();
+		math = new Subject();
+	}
+	
+	public void setKoreanSubject(int score, String name) {
+		korean.subjectName = name;
+		korean.Score = score;
+	}
+	public void setMathSubject(int score, String name) {
+		math.subjectName = name;
+		math.Score = score;
+	}
+	
+	public void showStudentScore() {
+		int total = korean.Score + math.Score;
+		
+		System.out.println(studentName + " 학생의 총점은 " + total + "점 입니다.");
+	}
+}
+```
+- Subject
+```java
+public class Subject {
+	String subjectName;
+	int Score;
+	int subjectId;
+}
+```
+- StudentTest
+```java
+public class StudentTest {
+
+	public static void main(String[] args) {
+		Student studentLim = new Student(001, "Lim");
+		studentLim.setKoreanSubject(100, "국어");
+		studentLim.setMathSubject(100, "수학");
+		
+		Student studentWoo = new Student(002, "Woo");
+		studentWoo.setKoreanSubject(100, "국어");
+		studentWoo.setMathSubject(100, "수학");
+		
+		
+		studentLim.showStudentScore();
+		studentWoo.showStudentScore();
+	}
+
+}
+```
