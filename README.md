@@ -535,3 +535,105 @@ public class StudentTest {
 
 }
 ```
+
+## 접근 제어 지시자
+- 클래스 외부에서 클래스의 멤버 변수, 메서드, 생성자를 사용할 수 있는지 여부를 지정하는 키워드
+접근제어지시자 | 설명
+-- | --
+private | 같은 클래스 내부에서만 접근가능(외부 클래스, 상속관계의 클래스에서도 접근 불가)
+아무것도 없음(default) | 같은 패키지 내부에서만 접근 가능 (상속관계라도 패키지가 다르면 불가)
+protected | 같은 패키지나 상속관계의 클래스에서 접근 가능하고 그 외 외부에서는 접근 할 수 없음
+public | 클래스의 외부 어디서나 접근할 수 있음
+
+### get() / set() 메서드
+- private으로 선언된 멤버 변수(필드)에 대해 접근, 수정할 수 있는 메서드를 public으로 제공
+- get() 메서드만 제공되는 경우 read-only 필드
+- 이클립스에서 자동으로 생성됨
+
+## 정보 은닉
+- private으로 제어한 멤버변수도 public메서드가 제공되면 접근 가능하지만 변수가 public으로 공개되었을 때보다 private일 때 각 변수에 대한 제한을 public메서드에서 제어할 수 있음
+<hr />
+- BirthDay
+```java
+public class BirthDay {
+	private int day;
+	private int month;
+	private int year;
+	
+//	public 이나 접근제어지시자 없이 사용하는 것처럼 다 오픈해서 사용하면
+//	멤버변수의 잘못된 사용으로 객체가 잘못 사용되는 것을 노출하게 되고 객체의 어떤 역할에대해서 문제가 생길 수 있다.
+//	그래서 private로 막고 메서드에서 제어를 해주게 되면 쓸데없는 데이터 오용이 막아진다.
+	
+	private boolean isValid; // default 값으로 false를 갖는다
+	
+	public int getDay() {
+		return day;
+	}
+	
+	public void setDay(int day) {
+		this.day = day;
+	}
+
+	public int getMonth() {
+		return month;
+	}
+
+	public void setMonth(int month) {
+		if(month < 1 || month > 12) {
+			isValid = false;
+		}
+		else {
+			isValid = true;
+			this.month = month;
+		}
+	}
+
+	public int getYear() {
+		return year;
+	}
+
+	public void setYear(int year) {
+		this.year = year;
+	}
+	
+	public void showDate() {
+		if(isValid) {
+			System.out.println(year + "년 " + month + "월 " + day + "일 입니다.");
+		}
+		else {
+			System.out.println("유효하지 않는 날짜 입니다.");
+		}
+	}
+	
+	public boolean getIsValid() {
+		return isValid;
+		// isValid의 값이 정해지는 것은 내부 로직에 의해서 정해진다. 그래서 isValid에 대한 set메서드는 제공하지 않는다.
+		// 이런 경우가 read-only 속성
+	}
+}
+```
+- BirthDayTest
+```java
+public class BirthDayTest {
+
+	public static void main(String[] args) {
+		BirthDay date = new BirthDay();
+		
+		date.setYear(2021);
+		date.setMonth(12);
+		date.setDay(30);
+		
+		date.showDate();
+	}
+}
+```
+
+## 캡슐화
+### 정보은닉을 활용한 캡슐화
+- 꼭 필요한 정보와 기능만 외부에 오픈함
+- 대부분의 멤버 변수와 메서드를 감추고 외부에 통합된 인터페이스만을 제공하여 일관된 기능을 구현하게 함
+	- 이러한 경우에는 클라이언트가 제어할 부분이 굉장히 적기 때문에 캡슐화가 잘되어있는 객체같은 경우는 클라이언트에서 쓸 수 있는 API가 한정적이기도 하고 그 객체가 하는 기능이 매번 
+	  일관성있게 제공될 수 있다
+	- 오류에 대한 감지를 클라이언트 코드하고 상관없이 서비스가 제공하는 객체쪽에서 주로 오류감지나 객체에대한 업그레이드 이런것들을 하면 되기 때문에 오히려 디버깅이나 기능을 추가하는     데에 유연하다 
+- 각각의 메서드와 멤버변수를 접근함으로써 발생하는 오류를 최소화한다
+
