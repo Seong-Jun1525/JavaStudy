@@ -728,3 +728,62 @@ ch13.Person@123a439b
 - 객체지향 프로그램에서 객체 간에는 협력이 이루어짐
 - 협력을 위해서는 필요한 메세지를 전송하고 이를 처리하는 기능이 구현되어야 함
 - 매개변수로 객체가 전달되는 경우가 발생
+
+### review
+- Student
+```java
+public class Student {
+	String studentName;
+	int money;
+	
+	public Student(String studentName, int money) {
+		this.studentName = studentName;
+		this.money = money;
+	}
+	
+	public void takeTaxi(Taxi taxi) {
+		taxi.take(10000);
+		this.money -= 10000;
+	}
+	
+	public void showInfo() {
+		System.out.println(studentName + "님의 남은 돈은 " + money + "원");
+	}
+}
+```
+- Taxi
+```java
+public class Taxi {
+	String taxiName;
+	int money;
+	
+	public Taxi(String taxiName) {
+		this.taxiName = taxiName;
+	}
+	
+	public void take(int money) {
+		this.money += money;
+	}
+	
+	public void showTaxiInfo() {
+		System.out.println(taxiName + "택시 수입은 " + money + "원 입니다.");
+	}
+}
+```
+
+- TakeTransTest
+```java
+public class TakeTransTest {
+
+	public static void main(String[] args) {
+		Student s1 = new Student("Edward", 20000);
+		
+		Taxi taxi = new Taxi("잘 나간다 운수");
+		
+		s1.takeTaxi(taxi);
+		
+		s1.showInfo();
+		taxi.showTaxiInfo();
+	}
+}
+```
