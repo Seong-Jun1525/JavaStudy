@@ -787,3 +787,154 @@ public class TakeTransTest {
 	}
 }
 ```
+
+# 여러 인스턴스에서 공통으로 사용하는 변수 선언 - static 변수
+## 공통으로 사용하는 변수가 필요한 경우
+- 여러 인스턴스가 공유하는 기준 값이 필요한 경우
+- 학생마다 새로운 학번 생성
+- 카드회사에서 카드를 새로 발급할때마다 새로운 카드 번호를 부여
+- 회사에 사원이 입사할때 마다 새로운 사번이 필요
+
+## static 변수 선언과 사용하기
+static int serialNum;
+- 인스턴스가 생성될 때 만들어지는 변수가 아닌, 처음 프로그램이 메모리에 로딩될 때 데이터 영역에 메모리가 할당되고 프로그램이 다 끝나고 메모리에서 unload되는 순간에 소멸된다
+- 클래스 변수, 정적 변수라고도 함(vs 인스터스 변수)
+- 인스턴스 생성과 상관없이 사용 가능하므로 클래스 이름으로 직접 참조
+Student.serialNum = 100;
+
+## Test
+### Employee.java
+```java
+public class Employee {
+	public static int serialNum = 1000;
+	
+	private int employeeId;
+	private String employeeName;
+	private String department;
+	
+	public int getEmployeeId() {
+		return employeeId;
+	}
+	public void setEmployeeId(int employeeId) {
+		this.employeeId = employeeId;
+	}
+	public String getEmployeeName() {
+		return employeeName;
+	}
+	public void setEmployeeName(String employeeName) {
+		this.employeeName = employeeName;
+	}
+	public String getDepartment() {
+		return department;
+	}
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+}
+```
+### EmployeeTest
+```java
+public class EmployeeTest {
+
+	public static void main(String[] args) {
+		Employee employeeLim = new Employee();
+		employeeLim.setEmployeeName("Lim");
+		
+		System.out.println(employeeLim.serialNum);
+		
+		Employee employeeWoo = new Employee();
+		employeeWoo.setEmployeeName("Woo");
+		employeeWoo.serialNum++;
+		
+		System.out.println(employeeLim.serialNum);
+		System.out.println(employeeWoo.serialNum);
+	}
+}
+```
+### 출력 결과
+```textarea
+1000
+1001
+1001
+```
+- 2개의 인스턴스가 하나의 메모리를 공유한다(static 변수는 인스턴스에서 공통으로 사용하는 영역이다)
+
+### 회사원이 입사할 때마다 새로운 사번 부여하기
+```java
+public class Employee {
+	public static int serialNum = 1000;
+	
+	private int employeeId;
+	private String employeeName;
+	private String department;
+	
+	// 객체가 생성될 때 초기화 작업은 생성자에서 해준다
+	public Employee() {
+		serialNum++;
+		// 이 변수는 공유x.
+		// 이 변수를 바로 사번아이디로 할 수 없는 이유
+		// 이 변수는 모든 인스턴스가 공유하기 때문
+		// 그래서 멤버변수에 복사를 한다
+		employeeId = serialNum;
+	}
+	
+	public int getEmployeeId() {
+		return employeeId;
+	}
+	public void setEmployeeId(int employeeId) {
+		this.employeeId = employeeId;
+	}
+	public String getEmployeeName() {
+		return employeeName;
+	}
+	public void setEmployeeName(String employeeName) {
+		this.employeeName = employeeName;
+	}
+	public String getDepartment() {
+		return department;
+	}
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+}
+```
+
+```java
+public class EmployeeTest {
+
+	public static void main(String[] args) {
+		Employee employeeLim = new Employee();
+		employeeLim.setEmployeeName("Lim");
+		
+		System.out.println(Employee.serialNum);
+//		System.out.println(employeeLim.serialNum);
+		// 노란밑줄이 있는 이유
+		// serialNum는 클래스변수이다
+		// 인스턴스의 생성하고는 상관없이 사용할 수 있다
+		// 즉, serialNum은 클래스변수이기 때문에 클래스이름으로 참조해서 사용하라는 의미
+		
+		Employee employeeWoo = new Employee();
+		employeeWoo.setEmployeeName("Woo");
+		Employee.serialNum++;
+//		employeeWoo.serialNum++;
+		
+		System.out.println(employeeLim.getEmployeeName() + "님의 사번 : " + employeeLim.getEmployeeId());
+		System.out.println(employeeWoo.getEmployeeName() + "님의 사번 : " + employeeWoo.getEmployeeId());
+	}
+}
+```
+### 출력 결과
+```textarea
+1001
+Lim님의 사번 : 1001
+Woo님의 사번 : 1002
+```
+
+### 출력 결과
+```textarea
+여러 인스턴스가 공유하는 어떠한 값이 필요할때 그것은 static을 활용한다
+```
+
+# static 메서드의 구현과 활용, 변수의 유효 범위
+## static메서드 만들기
+- 변수를 private으로 선언하고 getter/setter 구현
