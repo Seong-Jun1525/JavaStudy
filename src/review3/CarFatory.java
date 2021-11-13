@@ -17,7 +17,6 @@ public class CarFatory {
 
 	public Car createCar() {
 		Car car = new Car();
-		car.getCarId();
 		
 		return car;
 	}
