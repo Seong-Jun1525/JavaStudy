@@ -1106,25 +1106,20 @@ public class CompanyTest {
 public class CarFatory {
 	private static CarFatory instance = new CarFatory();
 	
-	private CarFatory() {
-		
-	}
+	private CarFatory() { }
 	
 	public static CarFatory getInstance() {
 		if (instance == null) {
 			instance = new CarFatory();
 		}
-		
 		return instance;
 	}
 
 	public Car createCar() {
 		Car car = new Car();
-		car.getCarId();
 		
 		return car;
 	}
-
 }
 ```
 ## Car
@@ -1133,23 +1128,19 @@ public class Car {
 
 	private static int serialNum = 10000;
 	
-	private int carId;
+	private int carNum;
 	
-	public int getCarNum() {
+	public Car() {
 		serialNum++;
-		return serialNum;
+		carNum = serialNum;
 	}
 
-	public int getCarId() {
-		return carId;
+	public int getCarNum() {
+		return carNum;
 	}
 
-	public void setCarId(int carId) {
-		this.carId = carId;
-	}
-
-	public static int getSerialNum() {
-		return serialNum;
+	public void setCarNum(int carNum) {
+		this.carNum = carNum;
 	}
 }
 ```
