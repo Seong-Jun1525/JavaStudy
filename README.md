@@ -1581,3 +1581,43 @@ ch18.Book@2401f4c3
 ch18.Book@7637f22
 책5 SJ
 ```
+
+# 2차원 배열 사용하기
+## 다차원 배열
+- 2차원 이상으로 구현된 배열
+- 평면(2차원 배열)이나 공간(3차원 배열)을 활용한 프로그램 구현
+
+## 2차원 배열 예제
+```java
+int[][] arr = new int[2][3]
+int[][] arr = {{1, 2, 3}, {4, 5, 6}}
+```
+
+###  TwoDimenstionTest.java
+```java
+public class TwoDimenstionTest {
+
+	public static void main(String[] args) {
+//	int[][] arr = {{1, 2, 3}, {1, 2, 3, 4}};
+//	int[][] arr = new int[3][4];
+		for(int i = 0; i < arr.length; i++) {
+			for(int j = 0; j < arr[i].length; j++) {
+				System.out.print(arr[i][j] + " ");
+			}
+			System.out.println("\t" + arr[i].length);
+		}
+	}
+
+}
+```
+### 주석 1번 출력결과
+```textarea
+1 2 3 	3
+1 2 3 4 	4
+```
+### 주석 2번 출력결과
+```textarea
+0 0 0 0 	4
+0 0 0 0 	4
+0 0 0 0 	4
+```
