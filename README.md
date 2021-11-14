@@ -1189,6 +1189,7 @@ ids = new int[] {10, 20, 30} // 선언 후 배열을 생성하는 경우는 new 
 - [] 인덱스 연산자 활용 : 배열요소가 저장된 메모리의 위치를 연산하여 찾아줌
 - 배열을 이용하여 합을 구하기
 
+### ArrayTest.java
 ```java
 public class ArrayTest {
 
@@ -1208,6 +1209,11 @@ public class ArrayTest {
 	}
 
 }
+```
+
+### 출력결과
+```textarea
+55
 ```
 
 ## 배열의 길이와 요소의 개수는 동일하지 않는다
@@ -1294,4 +1300,284 @@ public class ArrayTest2 {
 	}
 
 }
+```
+### 출력결과
+```textarea
+A 65
+B 66
+C 67
+D 68
+E 69
+F 70
+G 71
+H 72
+I 73
+J 74
+K 75
+L 76
+M 77
+N 78
+O 79
+P 80
+Q 81
+R 82
+S 83
+T 84
+U 85
+V 86
+W 87
+X 88
+Y 89
+Z 90
+```
+
+# 객체 배열 사용하기
+## 객체 배열 선언과 구현
+- 기본 자료형 배열은 선언과 동시에 배열의 크기 만큼 메모리가 할당되지만, 객체 배열의 경우에는 요소가 되는 객체의 주소가 들어갈(4바이트, 8바이트) 메모리만 할당되고(null) 각 요소 객체는 생성하여 저장해야 함
+
+### Book.java
+```java
+public class Book {
+	private String title;
+	private String author;
+	
+	public Book() {
+		
+	}
+	
+	public Book(String title, String author) { // 초기화 작업
+		this.title = title;
+		this.author = author;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getAuthor() {
+		return author;
+	}
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+	
+	public void showInfo() {
+		System.out.println(title + " " + author);
+	}
+	
+}
+```
+
+### BookTest.java
+```java
+public class BookTest {
+
+	public static void main(String[] args) {
+		Book[] library = new Book[5];
+		
+//		for(int i = 0; i < library.length; i++) {
+//			System.out.println(library[i]); // null
+//		}
+		
+		library[0] = new Book("책1", "SJ");
+		library[1] = new Book("책2", "SJ");
+		library[2] = new Book("책3", "SJ");
+		library[3] = new Book("책4", "SJ");
+		library[4] = new Book("책5", "SJ");
+		
+		for(Book book : library) {
+			System.out.println(book);
+			book.showInfo();
+		}
+	}
+
+}
+```
+### 출력결과
+```textarea
+ch18.Book@7de26db8
+책1 SJ
+ch18.Book@1175e2db
+책2 SJ
+ch18.Book@36aa7bc2
+책3 SJ
+ch18.Book@76ccd017
+책4 SJ
+ch18.Book@182decdb
+책5 SJ
+```
+
+
+## 객체 배열 복사하기
+- System.arrayCopy(src, srcPos, dest, destPos, length) 자바에서 제공되는 배열 복사 메서드
+### 얕은 복사
+- 객체 주소만 복사되어 한쪽 배열의 요소를 수정하면 같이 수정됨
+- 즉, 두 배열이 같은 객체를 가리킴
+
+### ObjectCopyTest.java
+```java
+public class ObjectCopyTest {
+
+	public static void main(String[] args) {
+		Book[] library = new Book[5];
+		Book[] copyLibrary = new Book[5];
+		
+		library[0] = new Book("책1", "SJ");
+		library[1] = new Book("책2", "SJ");
+		library[2] = new Book("책3", "SJ");
+		library[3] = new Book("책4", "SJ");
+		library[4] = new Book("책5", "SJ");
+		
+		System.arraycopy(library, 0, copyLibrary, 0, 5);
+		
+		System.out.println("== library == ");
+		for(Book book : library) {
+			System.out.println(book);
+			book.showInfo();
+		}
+		
+		System.out.println("== copyLibrary == ");
+		for(Book book : copyLibrary) {
+			System.out.println(book);
+			book.showInfo();
+		}
+		
+		library[0].setAuthor("SA");
+		library[0].setTitle("Book");
+		
+		System.out.println("== 수정 후 library == ");
+		for(Book book : library) {
+			System.out.println(book);
+			book.showInfo();
+		}
+		
+		System.out.println("== 수정 후 copyLibrary == ");
+		for(Book book : copyLibrary) {
+			System.out.println(book);
+			book.showInfo();
+		}
+	}
+
+}
+```
+### 출력 결과
+```textarea
+== library == 
+ch18.Book@7de26db8
+책1 SJ
+ch18.Book@1175e2db
+책2 SJ
+ch18.Book@36aa7bc2
+책3 SJ
+ch18.Book@76ccd017
+책4 SJ
+ch18.Book@182decdb
+책5 SJ
+== copyLibrary == 
+ch18.Book@7de26db8
+책1 SJ
+ch18.Book@1175e2db
+책2 SJ
+ch18.Book@36aa7bc2
+책3 SJ
+ch18.Book@76ccd017
+책4 SJ
+ch18.Book@182decdb
+책5 SJ
+== 수정 후 library == 
+ch18.Book@7de26db8
+Book SA
+ch18.Book@1175e2db
+책2 SJ
+ch18.Book@36aa7bc2
+책3 SJ
+ch18.Book@76ccd017
+책4 SJ
+ch18.Book@182decdb
+책5 SJ
+== 수정 후 copyLibrary == 
+ch18.Book@7de26db8
+Book SA
+ch18.Book@1175e2db
+책2 SJ
+ch18.Book@36aa7bc2
+책3 SJ
+ch18.Book@76ccd017
+책4 SJ
+ch18.Book@182decdb
+책5 SJ
+```
+
+### 깊은 복사
+- 각각의 객체를 생성하여 그 객체의 값을 복사하여 배열이 서로 다른 객체를 가리키도록 함
+
+```java
+public class ObjectCopyTest {
+
+	public static void main(String[] args) {
+		Book[] library = new Book[5];
+		Book[] copyLibrary = new Book[5];
+		
+		library[0] = new Book("책1", "SJ");
+		library[1] = new Book("책2", "SJ");
+		library[2] = new Book("책3", "SJ");
+		library[3] = new Book("책4", "SJ");
+		library[4] = new Book("책5", "SJ");
+		
+		copyLibrary[0] = new Book();
+		copyLibrary[1] = new Book();
+		copyLibrary[2] = new Book();
+		copyLibrary[3] = new Book();
+		copyLibrary[4] = new Book();
+		
+		for(int i = 0; i < library.length; i++) {
+			copyLibrary[i].setAuthor(library[i].getAuthor());
+			copyLibrary[i].setTitle(library[i].getTitle());
+		}
+		
+		library[0].setAuthor("SA");
+		library[0].setTitle("Book");
+		
+		System.out.println("== 수정 후 library == ");
+		for(Book book : library) {
+			System.out.println(book);
+			book.showInfo();
+		}
+		
+		System.out.println("== 수정 후 copyLibrary == ");
+		for(Book book : copyLibrary) {
+			System.out.println(book);
+			book.showInfo();
+		}
+	}
+
+}
+```
+
+### 출력결과
+```textarea
+== 수정 후 library == 
+ch18.Book@7de26db8
+Book SA
+ch18.Book@1175e2db
+책2 SJ
+ch18.Book@36aa7bc2
+책3 SJ
+ch18.Book@76ccd017
+책4 SJ
+ch18.Book@182decdb
+책5 SJ
+== 수정 후 copyLibrary == 
+ch18.Book@26f0a63f
+책1 SJ
+ch18.Book@4361bd48
+책2 SJ
+ch18.Book@53bd815b
+책3 SJ
+ch18.Book@2401f4c3
+책4 SJ
+ch18.Book@7637f22
+책5 SJ
 ```
