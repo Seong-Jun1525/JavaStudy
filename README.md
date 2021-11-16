@@ -1793,3 +1793,195 @@ C++같은 경우는 여러개가 올 수 있는데 이러면 모호성이 발생
 - 상위클래스는 하위클래스보다 더 일반적인 개념과 기능을 가집니다.
 - 하위클래스는 상위클래스보다 더 구체적인 개념과 기능을 가집니다.
 - 하위클래스가 상위클래스의 속성과 기능을 확장(extends)한다는 의미입니다.
+
+# 상속을 활용한 멤버쉽 클래스 구현하기
+## 멤버쉽 시나리오
+```textarea
+회사에서 고객 정보를 활용한 맞춤 서비스를 하기 위해 일반고객과 이보다 충성도가 높은 우수고객에 따른 서비스를 제공하고자 합니다.
+
+물품을 구매할 때 적용되는 할인율과 적립되는 보너스 포인트의 비율이 다릅니다.
+여러 멤버쉽에 대한 각각 다양한 서비스를 제공할 수 있습니다.
+멤버쉽에 대한 구현을 클래스 상속을 활용하여 구현합니다.
+```
+## 일반 고객 클래스 구현
+- 고객의 속성 : 고객 아이디, 이름, 등급, 보너스 포인트, 보너스 포인트 적립비율
+- 일반 고객의 경우 물품 구매시 1%의 보너스 포인트 적립
+
+### Customer.java
+```java
+public class Customer {
+	private int customerID;
+	private String customerName;
+	private String customerGrade;
+	int bonusPoint;
+	double bonusRatio;
+	
+	public Customer() {
+		customerGrade = "SILVER";
+		bonusRatio = 0.01;
+	}
+	
+	public int calcPrice(int price) {
+		bonusPoint += price * bonusRatio;
+		return price;
+	}
+	
+	public String showCustomerInfo() {
+		return customerName + "님의 등급은 " + customerGrade + "이며, 보너스 포인트는 " + bonusPoint + "입니다.";
+	}
+}
+```
+
+## 우수 고객 구현
+```textarea
+매출에 더 많은 기여를 하는 단골 고객입니다.
+
+제품을 살 때 10%를 할인해 줍니다.
+
+보너스 포인트는 제품 가격의 5%를 적립해 줍니다.
+
+담당 전문 상담원이 배정됩니다.
+```
+- Customer 클래스에 추가해서 구현하는 것은 좋지않습니다.
+- VIPCustomer 클래스를 따로 구현합니다.
+- 이미 Customer에 구현된 내용이 중복되므로 Customer를 확장하여 구현합니다.(상속)
+
+### Customer.java
+```java
+public class Customer {
+//	protected : 상위 클래스에서는 외부 클래스가 접근할 수 없지만 하위 클래스에서는 접근할 수 있게 해줌
+	protected int customerID;
+	protected String customerName;
+	protected String customerGrade;
+	int bonusPoint;
+	double bonusRatio;
+	
+	public Customer() {
+		customerGrade = "SILVER";
+		bonusRatio = 0.01;
+	}
+	
+	public int calcPrice(int price) {
+		bonusPoint += price * bonusRatio;
+		return price;
+	}
+	
+	public String showCustomerInfo() {
+		return customerName + "님의 등급은 " + customerGrade + "이며, 보너스 포인트는 " + bonusPoint + "입니다.";
+	}
+}
+```
+
+### VIPCustomer.java
+```java
+public class VIPCustomer extends Customer {
+	double salesRatio;
+	String agentID;
+	
+	public VIPCustomer() {
+		bonusRatio = 0.05;
+		salesRatio = 0.1;
+		customerGrade = "VIP";
+	}
+}
+```
+
+## protected 접근 제어자
+- 상위 클래스에 선언된 private 멤버변수는 하위 클래스에서 접근 할 수 없습니다.
+- 외부 클래스는 접근할 수 없지만, 하위 클래스는 접근 할 수 있도록 protected 접근제어자를 사용합니다.
+
+### CustomerTest.java
+```java
+public class CustomerTest {
+
+	public static void main(String[] args) {
+		Customer customerLim = new Customer();
+		customerLim.setCustomerName("Seong Jun");
+		customerLim.setCustomerID(10010);
+		customerLim.bonusPoint = 1000;
+		
+		System.out.println(customerLim.showCustomerInfo());
+		
+		VIPCustomer customerWoo = new VIPCustomer();
+		customerWoo.setCustomerName("Woo");
+		customerWoo.setCustomerID(10011);
+		customerWoo.bonusPoint = 10000;
+		customerWoo.showCustomerInfo();
+
+		System.out.println(customerWoo.showCustomerInfo());
+	}
+}
+```
+
+### 출력결과
+```textarea
+Seong Jun님의 등급은 SILVER이며, 보너스 포인트는 1000입니다.
+Woo님의 등급은 VIP이며, 보너스 포인트는 10000입니다.
+```
+
+# 상속에서 클래스 생성과정과 형 변환
+## 하위 클래스가 생성되는 과정
+- 하위 클래스를 생성하면 상위 클래스가 먼저 생성됩니다.
+- new VIPCustomer()를 호출하면 Customer()가 먼저 호출 됩니다.
+- 클래스가 상속 받은 경우 하위 클래스의 생성자에서는 반드시 상위 클래스의 생성자를 호출합니다.
+
+### Customer.java
+```java
+public Customer() {
+	customerGrade = "SILVER";
+	bonusRatio = 0.01;
+	
+	System.out.println("Customer() 생성자 호출");
+}
+```
+### VIPCustomer.java
+```java
+public VIPCustomer() {
+	bonusRatio = 0.05;
+	salesRatio = 0.1;
+	customerGrade = "VIP";
+	
+	System.out.println("VIPCustomer() 생성자 호출");
+}
+```
+
+### CustomerTest.java
+```java
+public class CustomerTest {
+
+	public static void main(String[] args) {
+		VIPCustomer customerWoo = new VIPCustomer();
+		customerWoo.setCustomerName("Woo");
+		customerWoo.setCustomerID(10011);
+		customerWoo.bonusPoint = 10000;
+		customerWoo.showCustomerInfo();
+
+		System.out.println(customerWoo.showCustomerInfo());
+	}
+}
+```
+### 위와 같이 수정한 후 출력결과
+### 출력결과
+```textarea
+Customer() 생성자 호출
+VIPCustomer() 생성자 호출
+Woo님의 등급은 VIP이며, 보너스 포인트는 10000입니다.
+```
+
+- VIPCustomer은 Customer를 상속을 받고 있습니다.
+- 그렇기 때문에 Customer의 생성자(constructer)를 호출해야합니다.
+- 그런데 상위 클래스의 생성자를 호출하는 코드가 없습니다.
+- 그렇기 때문에 컴파일러는 아래와 같은 코드를 넣어줍니다.
+
+```java
+public VIPCustomer() {
+	super();
+	
+	bonusRatio = 0.05;
+	salesRatio = 0.1;
+	customerGrade = "VIP";
+}
+```
+## super() 키워드
+- 하위 클래스가 상위 클래스 인스턴스의 참조값을 가집니다.
+- 생성자를 호출할 수 있는 기능이 있습니다.
