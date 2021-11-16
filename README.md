@@ -1621,3 +1621,175 @@ public class TwoDimenstionTest {
 0 0 0 0 	4
 0 0 0 0 	4
 ```
+
+# 객체 배열을 구현한 클래스 ArrayList
+## java.util 패키지에서 제공되는 ArrayList
+- 기존의 배열 선언과 사용방식은 배열의 길이를 정하고 요소의 개수가 배열의 길이보다 커지면 배열을 재할당하고 복사해야했다.
+- 배열의 요소를 추가하거나 삭제하면 다른요소들의 이동에대한 구현을 해야했다.
+- ArrayList는 객체배열을 좀 더 효율적으로 관리하기 위해 자바에서 제공해주는 클래스이다.
+- 이미 많은 메서드들이 최적의 알고리즘으로 구현되어 있어 각 메서드의 사용방법만 익히면 유용하게 사용할 수 있다.
+
+## ArrayList의 주요 메서드
+메서드 | 설명
+-- | --
+boolean add(E e) | 요소 하나를 배열에 추가. E는 요소의 자료형을 의미
+int size() | 배열에 추가된 요소 전체 개수를 반환
+E get(int index) | 배열의 index위치에 있는 요소 값을 반환
+E remove(int index) | 배열의 index위치에 있는 요소 값을 제거하고 그 값을 반환
+boolean isEmpty() | 배열이 비어있는지 확인
+
+### ArrayListTest.java
+```java
+import java.util.ArrayList;
+
+import ch18.Book;
+
+public class ArrayListTest {
+
+	public static void main(String[] args) {
+		ArrayList<Book> library = new ArrayList<>();
+		
+		library.add(new Book("책1", "SJ"));
+		library.add(new Book("책2", "SJ"));
+		library.add(new Book("책3", "SJ"));
+		library.add(new Book("책4", "SJ"));
+		library.add(new Book("책5", "SJ"));
+		
+		for(int i = 0; i < library.size(); i++) {
+			library.get(i).showInfo();
+		}
+	}
+}
+```
+
+# ArrayList를 이용한 간단한 성적 산출 프로그램
+
+## Student.java
+```java
+public class Student {
+	
+	int studentID;
+	String studentName;
+	
+	ArrayList<Subject> subjectList;
+
+	
+	public Student(int studentID, String studentName) {
+		this.studentID = studentID;
+		this.studentName = studentName;
+		
+		subjectList = new ArrayList<>();
+	}
+
+	
+	public void addSubject(String name, int point) {
+		Subject subject = new Subject();
+		
+		subject.setName(name);
+		subject.setScorePoint(point);
+		
+		subjectList.add(subject);
+	}
+
+	public void showInfo() {
+		int total = 0;
+		
+		for(Subject subject : subjectList) {
+			total += subject.getScorePoint();
+			
+			System.out.println(studentName + "학생의 " + subject.getName() + " 과목의 성적은 " + subject.getScorePoint() + "입니다.");
+		}
+		
+		System.out.println(studentName + " 학생의 총점은 " + total + "점 입니다.");
+	}
+}
+```
+
+## Subject.java
+```java
+public class Subject {
+
+	private String name;
+	private int scorePoint;
+	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public int getScorePoint() {
+		return scorePoint;
+	}
+	public void setScorePoint(int scorePoint) {
+		this.scorePoint = scorePoint;
+	}
+}
+```
+
+## SubjectScoreTest.java
+```java
+public class SubjectScoreTest {
+
+	public static void main(String[] args) {
+		Student studentLim = new Student(1001, "Lim");
+		
+		studentLim.addSubject("국어", 100);
+		studentLim.addSubject("수학", 50);
+		
+		Student studentWoo = new Student(1002, "Woo");
+		
+		studentWoo.addSubject("국어", 70);
+		studentWoo.addSubject("수학", 85);
+		studentWoo.addSubject("영어", 100);
+		
+		studentLim.showInfo();
+		System.out.println("===============================");
+		studentWoo.showInfo();
+	}
+}
+```
+
+## 출력결과
+```textarea
+Lim학생의 국어 과목의 성적은 100입니다.
+Lim학생의 수학 과목의 성적은 50입니다.
+Lim 학생의 총점은 150점 입니다.
+===============================
+Woo학생의 국어 과목의 성적은 70입니다.
+Woo학생의 수학 과목의 성적은 85입니다.
+Woo학생의 영어 과목의 성적은 100입니다.
+Woo 학생의 총점은 255점 입니다.
+```
+
+# JavaStudy 3차
+# 객체 간의 상속의 의미
+## 클래스 상속
+- 새로운 클래스를 정의 할 때 이미 구현된 클래스를 상속 받아서 속성이나 기능을 확장하여 클래스를 구현합니다.
+- 이미 구현된 클래스보다 더 구체적인 기능을 가진 클래스를 구현해야 할 때 기존 클래스를 상속합니다.
+
+```textarea
+상속하는 클래스 : 상위 클래스, parent class, base class, super class
+상속받는 클래스 : 하위 클래스, child class, derived class, sub class
+```
+
+- 상속의 문법
+- ```java
+class B extends A {
+
+}
+```
+
+```textarea
+extends 키워드 뒤에는 단 하나의 클래스만 올 수 있습니다.
+
+C++같은 경우는 여러개가 올 수 있는데 이러면 모호성이 발생할 수 있기 때문에
+
+자바는 단일 상속(single inheritance)만을 지원합니다.
+(자세한건 나중에)
+```
+
+## 상속을 구현하는 경우
+- 상위클래스는 하위클래스보다 더 일반적인 개념과 기능을 가집니다.
+- 하위클래스는 상위클래스보다 더 구체적인 개념과 기능을 가집니다.
+- 하위클래스가 상위클래스의 속성과 기능을 확장(extends)한다는 의미입니다.
