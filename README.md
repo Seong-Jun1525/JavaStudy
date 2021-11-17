@@ -1883,6 +1883,10 @@ public class VIPCustomer extends Customer {
 		salesRatio = 0.1;
 		customerGrade = "VIP";
 	}
+	
+	public String getAgentID() {
+		return agentID;
+	}
 }
 ```
 
@@ -1984,4 +1988,120 @@ public VIPCustomer() {
 ```
 ## super() 키워드
 - 하위 클래스가 상위 클래스 인스턴스의 참조값을 가집니다.
-- 생성자를 호출할 수 있는 기능이 있습니다.
+- 상위 클래스의 기본 생성자를 호출할 수 있는 기능이 있습니다.
+- 하위 클래스에서 명시적으로 상위 클래스의 생성자를 호출하지 않으면 super()가 호출 됩니다. (이때 반드시 상위 클래스의 기본 생성자가 존재해야 합니다.)
+- 상위 클래스에 기본 생성자가 없는 경우 (다른 생성자가 있는 경우)하위 클래스의 생성자에서는 super를 이용하여 명시적으로 상위 클래스의 생성자를 호출 합니다.
+- super는 생성된 상위 클래스 인스턴스의 참조값을 가지므로 super를 이용하여 상위 클래스의 메서드나 멤버 변수에 접근할 수 있습니다.
+
+## default 생성자는 제공하고 싶지 않고 새로운 생성자를 만들었을 때
+### Customer.java
+```java
+/*
+public Customer() {
+	customerGrade = "SILVER";
+	bonusRatio = 0.01;
+}
+*/
+
+public Customer(int customerID, String customerName) {
+	this.customerID = customerID;
+	this.customerName = customerName;
+}
+```
+```textarea
+이렇게 수정하면 VIPCustomer에서 오류가 생깁니다.
+
+하위 클래스에서 오류가 생기는 이유는 아무런 생성자를 호출하고 있지 않으면
+컴파일러가 super()를 넣어주는데 default생성자를 주석처리 했으므로
+super()가 호출하는 코드가 없습니다.
+
+그렇기때문에 이런 경우는 상위 클래스의 생성자를 하위클래스에서 명시적으로 호출을 해야합니다.
+```
+### 하위클래스에서 명시적으로 호출하는 방법 2가지
+- 1
+```java
+public class VIPCustomer extends Customer {
+	double salesRatio;
+	String agentID;
+	
+	public VIPCustomer(int customerID, String customerName) {
+		super(customerID, customerName);
+		bonusRatio = 0.05;
+		salesRatio = 0.1;
+		customerGrade = "VIP";
+	}
+
+	public String getAgentID() {
+		return agentID;
+	}
+}
+```
+- 2
+```java
+public class VIPCustomer extends Customer {
+	double salesRatio;
+	String agentID;
+	
+	public VIPCustomer() {
+		super(0, "No-Name"); 
+		
+		bonusRatio = 0.05;
+		salesRatio = 0.1;
+		customerGrade = "VIP";
+	}
+
+	public String getAgentID() {
+		return agentID;
+	}
+}
+```
+- 1번을 추천!
+- 1번으로 수정을 하면 Test쪽에서 오류가 생깁니다. 아래와 같이 수정해줍니다.
+
+```java
+public class CustomerTest {
+
+	public static void main(String[] args) {
+		Customer customerLim = new Customer(10010, "Seong Jun");
+		customerLim.bonusPoint = 1000;
+		
+		System.out.println(customerLim.showCustomerInfo());
+		
+		VIPCustomer customerWoo = new VIPCustomer(10011, "Woo");
+		customerWoo.bonusPoint = 10000;
+
+		System.out.println(customerWoo.showCustomerInfo());
+	}
+}
+```
+
+### 출력결과
+```textarea
+Customer(int, String) 생성자 호출
+Seong Jun님의 등급은 SILVER이며, 보너스 포인트는 1000입니다.
+Customer(int, String) 생성자 호출
+VIPCustomer(int, String) 생성자 호출
+Woo님의 등급은 VIP이며, 보너스 포인트는 10000입니다.
+```
+
+## 상속에서 인스턴스 메모리의 상태
+- 항상 상위 클래스의 인스턴스가 먼저 생성되고 하위 클래스의 인스턴스가 생성됩니다.
+
+## 형 변환(업 캐스팅)
+- 상위 클래스로 변수를 선언하고 하위 클래스의 생성자로 인스턴스를 생성합니다.
+Customer customerLim = new VIPCustomer();
+- 상위 클래스 타입의 변수에 하위 클래스 변수가 대입
+VIPCustomer vCustomer = new VIPCustomer();
+addCustomer(vCustomer);
+int addCustomer(Customer customer) {
+
+}
+- 하위 클래스는 상위 클래스의 타입을 내포하고 있으므로 상위 클래스로의 묵시적 형 변환이 가능합니다.
+- 상속관계에서 모든 하위 클래스는 상위 클래스로 형 변환이 됩니다. (그 역은 성립하지 않습니다.)
+
+## 형 변환과 메모리
+- Customer vc = new VIPCustomer();에서 vc가 가리키는 것은?
+- VIPCustomer() 생성자에 의해 VIPCustomer 클래스의 모든 멤버 변수에 대한 메모리는 생성되었지만,
+  변수의 타입은 Customer이므로 실제 접근 가능한 변수나 메서드는 Customer의 변수와 메서드입니다.
+	
+![img1](./src/img/img1.png)
