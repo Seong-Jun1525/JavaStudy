@@ -2104,4 +2104,4 @@ int addCustomer(Customer customer) {
 - VIPCustomer() 생성자에 의해 VIPCustomer 클래스의 모든 멤버 변수에 대한 메모리는 생성되었지만,
   변수의 타입은 Customer이므로 실제 접근 가능한 변수나 메서드는 Customer의 변수와 메서드입니다.
 	
-![img1](./bin/img/img1.png)
+![img1](./src/img/img1.PNG)
