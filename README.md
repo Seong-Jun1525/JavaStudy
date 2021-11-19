@@ -2151,9 +2151,220 @@ System.out.println(vc.calcPrice(1000));
 # 메서드 재정의와 가상 메서드 원리
 ## 메서드가 어떻게 호출되고 실행 되는가?
 - 메서드의 이름은 주소값을 나타냅니다.
-- 메서드는 명령어의 set이고 프로그램이 로드되면 메서드 영역에 명령어 set이 위치합니다.
+- 메서드는 명령어의 set이고 프로그램이 로드되면 메서드 영역(코드영역)에 명령어 set이 위치합니다.
 - 해당 메서드가 호출되면 명령어 set이 있는 주소를 찾아 명령어가 실행됩니다.
 - 이때 메서드에서 사용하는 변수들은 스택 메모리에 위치 하게 됩니다.
-- 따라서 다른 인스턴스라도 같은 메서드의 코드는 같으므로 같은 메서드가 호출됩니다.
+- 따라서 다른 인스턴스라도 같은 메서드의 코드는 같으므로 같은 메서드가 호출됩니다.(다만 변수 값은 다릅니다.)
 - 인스턴스가 생성되면 변수는 힙 메모리에 따로 생성되지만 메서드 명령어 set은 처음 한번만 로드됩니다.
+```java
+public class TestMethod {
+   int num;
+   
+   void aaa() {
+      System.out.println("aaa() 호출");
+   }
+   
+   public static void main(String[] args) {
+      TestMethod a1 = new TestMethod();
+      a1.aaa();
+      
+      TestMethod a2 = new TestMethod();
+      a2.aaa();
+   }
+}
+```
 
+![img2](./src/img/img2.PNG)
+
+## 가상 메서드의 원리
+- 가상 메서드 테이블에서 해당 메서드에 대한 address를 가지고 있습니다.
+- 재정의된 경우는 재정의 된 메서드의 주소를 가리킵니다.
+
+![img3](./src/img/img3.PNG)
+
+# 다형성과 다형성을 사용하는 이유
+## 다형성이란?
+- 하나의 코드가 여러 자료형으로 구현되어 실행되는 것입니다.
+- 같은 코드에서 여러 다른 실행 결과가 나옵니다.
+- 정보은닉, 상속과 더불어 객체지향 프로그래밍의 가장 큰 특징 중 하나입니다.
+- 다형성을 잘 활용하면 유연하고 확장성있고, 유지보수가 편리한 프로그램을 만들 수 있습니다.
+
+## 다형성의 예
+```java
+class Animal {
+	 // 공통적으로 사용하는 메서드는 상위 클래스에 선언합니다.
+   public void move() {
+      System.out.println("동물이 움직입니다.");
+   }
+}
+
+class Human extends Animal {
+
+   @Override
+   public void move() {
+      System.out.println("사람이 걷습니다.");
+   }
+   
+   public void readBook() {
+      System.out.println("사람이 책을 읽습니다.");
+   }
+   
+}
+
+class Tiger extends Animal {
+
+   @Override
+   public void move() {
+      System.out.println("호랑이가 네발로 뜁니다.");
+   }
+   
+   public void hunting() {
+      System.out.println("호랑이가 사냥을 합니다.");
+   }
+   
+}
+
+class Eagle extends Animal {
+
+   @Override
+   public void move() {
+      System.out.println("독수리가 하늘을 날아 다닙니다.");
+   }
+   
+   public void flying() {
+      System.out.println("독수리가 양날개를 쭉 펴고 날아 다닙니다.");
+   }
+   
+}
+
+public class AnimalTest {
+
+   public static void main(String[] args) {
+      Animal h = new Human();
+      Animal t = new Tiger();
+      Animal e = new Eagle();
+      
+      AnimalTest test = new AnimalTest();
+      test.moveAnimal(h);
+      test.moveAnimal(e);
+      test.moveAnimal(t);
+			
+			System.out.println("==============================");
+			
+			ArrayList<Animal> animalList = new ArrayList<>();
+      animalList.add(h);
+      animalList.add(e);
+      animalList.add(t);
+      
+      for (Animal animal : animalList) {
+         animal.move();
+      }
+   }
+   
+   public void moveAnimal(Animal animal) {
+      animal.move();
+   }
+
+}
+```
+
+### 출력결과
+```textarea
+사람이 걷습니다.
+독수리가 하늘을 날아 다닙니다.
+호랑이가 네발로 뜁니다.
+==============================
+사람이 걷습니다.
+독수리가 하늘을 날아 다닙니다.
+호랑이가 네발로 뜁니다.
+```
+
+코드는 한 줄 인데 어떤 데이터형이 들어갔느냐에 따라(어떤 인스턴스형이 들어갔느냐에 따라) move()의 실행이 달라집니다. 이것이 다형성입니다. <br/>
+상속을 하게 되면 하위 클래스들을 상위 클래스 하나의 타입으로 모두 핸들링 할 수 있습니다. 클래스간의 결합도가 굉장히 높아집니다. <br/>
+하지만 상위 클래스를 바꾸면 하위 클래스에 영향을 미칠 수 있습니다. 그래서 상속을 설계할 때는 꼭 필요한 경우 신중하게 설계를 해야합니다. <br/><br/>
+
+## 다형성을 사용하는 이유?
+- 다른 동물을 추가하는 경우
+- 상속과 메서드 재정의를 활용하여 확장성 있는 프로그램을 만들 수 있습니다.
+- 그렇지 않는 경우 많은 if-else if문이 구현되고 코드의 유지보수가 어려워 집니다.
+- 상위 클래스에서는 공통적인 부분을 제공하고 하위 클래스에서는 각 클래스에 맞는 기능을 구현합니다.
+- 여러 클래스를 하나의 타입(상위 클래스)으로 핸들링 할 수 있습니다.
+
+## 다형성을 활용한 멤버쉽 프로그램 확장
+- 일반 고객과 VIP 고객 중간 멤버쉽 만들기
+```textarea
+고객이 늘어 일반 고객보다는 많이 구매하고 VIP보다는 적게 구매하는 고객에게도 혜택을 주는 경우
+
+GOLD 고객 등급을 만들고 혜택은 다음과 같습니다.
+1. 제품을 살때는 10%를 할인해줍니다.
+2. 보너스 포인트는 2%를 적립해줍니다.
+```
+
+### GoldCustomer.java
+```java
+public class GoldCustomer extends Customer {
+
+   double salesRatio;
+   
+   public GoldCustomer(int customerID, String customerName) {
+      super(customerID, customerName);
+      
+      salesRatio = 0.1;
+      bonusRatio = 0.02;
+      customerGrade = "Gold";
+   }
+
+   @Override
+   public int calcPrice(int price) {
+      bonusPoint += price * bonusRatio;
+      return price - (int)(price * salesRatio);
+   }
+}
+```
+
+### CustomerTest.java(수정)
+```java
+ArrayList<Customer> customerList = new ArrayList<>();
+Customer customerL = new Customer(10010, "Lim");
+Customer customerT = new Customer(10020, "Tom");
+Customer customerW = new GoldCustomer(10030, "Woo");
+Customer customerK = new GoldCustomer(10040, "Kim");
+Customer customerJ = new VIPCustomer(10050, "Jam");
+
+customerList.add(customerJ);
+customerList.add(customerK);
+customerList.add(customerW);
+customerList.add(customerT);
+customerList.add(customerL);
+
+for(Customer customer : customerList) {
+	 System.out.println(customer.showCustomerInfo());
+}
+
+int price = 10000;
+
+for(Customer customer : customerList) {
+	 int cost = customer.calcPrice(price);
+	 System.out.println(customer.getCustomerName() + "님이 " + cost + "원 지불하셨습니다.");
+	 System.out.println(customer.getCustomerName() + "님의 현재 보너스 포인트는 " + customer.bonusPoint + "입니다.");
+}
+```
+
+### 출력결과
+```console
+Jam님의 등급은 VIP이며, 보너스 포인트는 0입니다.
+Kim님의 등급은 Gold이며, 보너스 포인트는 0입니다.
+Woo님의 등급은 Gold이며, 보너스 포인트는 0입니다.
+Tom님의 등급은 SILVER이며, 보너스 포인트는 0입니다.
+Lim님의 등급은 SILVER이며, 보너스 포인트는 0입니다.
+Jam님이 9000원 지불하셨습니다.
+Jam님의 현재 보너스 포인트는 500입니다.
+Kim님이 9000원 지불하셨습니다.
+Kim님의 현재 보너스 포인트는 200입니다.
+Woo님이 9000원 지불하셨습니다.
+Woo님의 현재 보너스 포인트는 200입니다.
+Tom님이 10000원 지불하셨습니다.
+Tom님의 현재 보너스 포인트는 100입니다.
+Lim님이 10000원 지불하셨습니다.
+Lim님의 현재 보너스 포인트는 100입니다.
+```
