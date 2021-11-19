@@ -679,7 +679,7 @@ public class Person {
 }
 ```
 ### 출력 결과
-```teatarea
+```console
 이름없음, 1
 ```
 
@@ -718,7 +718,7 @@ public class Person {
 }
 ```
 ### 출력 결과
-```teatarea
+```console
 ch13.Person@123a439b
 ch13.Person@123a439b
 ```
@@ -852,7 +852,7 @@ public class EmployeeTest {
 }
 ```
 ### 출력 결과
-```textarea
+```console
 1000
 1001
 1001
@@ -924,14 +924,14 @@ public class EmployeeTest {
 }
 ```
 ### 출력 결과
-```textarea
+```console
 1001
 Lim님의 사번 : 1001
 Woo님의 사번 : 1002
 ```
 
 ### 출력 결과
-```textarea
+```console
 여러 인스턴스가 공유하는 어떠한 값이 필요할때 그것은 static을 활용한다
 ```
 
@@ -1212,7 +1212,7 @@ public class ArrayTest {
 ```
 
 ### 출력결과
-```textarea
+```console
 55
 ```
 
@@ -1302,7 +1302,7 @@ public class ArrayTest2 {
 }
 ```
 ### 출력결과
-```textarea
+```console
 A 65
 B 66
 C 67
@@ -1396,7 +1396,7 @@ public class BookTest {
 }
 ```
 ### 출력결과
-```textarea
+```console
 ch18.Book@7de26db8
 책1 SJ
 ch18.Book@1175e2db
@@ -1463,7 +1463,7 @@ public class ObjectCopyTest {
 }
 ```
 ### 출력 결과
-```textarea
+```console
 == library == 
 ch18.Book@7de26db8
 책1 SJ
@@ -1557,7 +1557,7 @@ public class ObjectCopyTest {
 ```
 
 ### 출력결과
-```textarea
+```console
 == 수정 후 library == 
 ch18.Book@7de26db8
 Book SA
@@ -1611,12 +1611,12 @@ public class TwoDimenstionTest {
 }
 ```
 ### 주석 1번 출력결과
-```textarea
+```console
 1 2 3 	3
 1 2 3 4 	4
 ```
 ### 주석 2번 출력결과
-```textarea
+```console
 0 0 0 0 	4
 0 0 0 0 	4
 0 0 0 0 	4
@@ -1751,7 +1751,7 @@ public class SubjectScoreTest {
 ```
 
 ## 출력결과
-```textarea
+```console
 Lim학생의 국어 과목의 성적은 100입니다.
 Lim학생의 수학 과목의 성적은 50입니다.
 Lim 학생의 총점은 150점 입니다.
@@ -1918,7 +1918,7 @@ public class CustomerTest {
 ```
 
 ### 출력결과
-```textarea
+```console
 Seong Jun님의 등급은 SILVER이며, 보너스 포인트는 1000입니다.
 Woo님의 등급은 VIP이며, 보너스 포인트는 10000입니다.
 ```
@@ -1966,7 +1966,7 @@ public class CustomerTest {
 ```
 ### 위와 같이 수정한 후 출력결과
 ### 출력결과
-```textarea
+```console
 Customer() 생성자 호출
 VIPCustomer() 생성자 호출
 Woo님의 등급은 VIP이며, 보너스 포인트는 10000입니다.
@@ -2076,7 +2076,7 @@ public class CustomerTest {
 ```
 
 ### 출력결과
-```textarea
+```console
 Customer(int, String) 생성자 호출
 Seong Jun님의 등급은 SILVER이며, 보너스 포인트는 1000입니다.
 Customer(int, String) 생성자 호출
@@ -2144,7 +2144,7 @@ Customer vc = new VIPCustomer(12345, "No-Name");
 System.out.println(vc.calcPrice(1000));
 ```
 ### 출력결과
-```textarea
+```console
 900
 ```
 
@@ -2269,7 +2269,7 @@ public class AnimalTest {
 ```
 
 ### 출력결과
-```textarea
+```console
 사람이 걷습니다.
 독수리가 하늘을 날아 다닙니다.
 호랑이가 네발로 뜁니다.
