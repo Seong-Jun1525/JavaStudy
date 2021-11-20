@@ -2368,3 +2368,249 @@ Tom님의 현재 보너스 포인트는 100입니다.
 Lim님이 10000원 지불하셨습니다.
 Lim님의 현재 보너스 포인트는 100입니다.
 ```
+
+# 상속은 언제 사용하나
+## IS-A관계(is a realationship : inheritance)
+- 일반적인 개념과 구체적인 개념과의 관계
+- 상위 클래스 : 하위 클래스보다 일반적인 개념(예 : Employee)
+- 하위 클래스 : 상위 클래스보다 더 구체적인 개념(예 : Engineer, Manager, ...)
+- 상속은 클래스간의 결합도가 높은 설계입니다.
+- 상위 클래스의 수정이 많은 하위 클래스에 영향을 미칠 수 있습니다.
+- 계층구조가 복잡하거나 계급(hierarchy)이 높으면 좋지 않습니다.
+
+## HSA-A관계(composition)
+- 클래스가 다른 클래스를 포함하는 관계(변수로 선언)입니다.
+- 코드 재사용의 가장 일반적인 방법입니다.
+- Student가 Subject를 포함하는 예제와 같은 경우입니다.
+- Library를 구현할 때 ArrayList를 생성하여 사용하였습니다.
+- 상속하지 않았습니다.
+
+# 다운 캐스팅과 instanceof
+## 다운캐스팅
+- 업캐스팅된 클래스를 다시 원래의 타입으로 형 변환입니다.
+- 하위 클래스로의 형 변환은 명시적으로 해야합니다.
+
+```java
+Customer vc = new VIPCustomer(); // 묵시적
+VIPCustomer vCustomer = (VIPCustomer)vc; // 명시적
+```
+
+## instanceof를 이용하여 인스턴스의 형 체크
+- 원래의 인스턴스의 형이 맞는지 여부를 체크하는 키워드입니다.
+- 맞으면 true 아니면 false를 반환합니다.
+
+### AnimalTest.java
+```java
+import java.util.ArrayList;
+
+class Animal {
+   // 공통적으로 사용하는 메서드는 상위 클래스에 선언합니다.
+   public void move() {
+      System.out.println("동물이 움직입니다.");
+   }
+}
+
+class Human extends Animal {
+
+   @Override
+   public void move() {
+      System.out.println("사람이 걷습니다.");
+   }
+   
+   public void readBook() {
+      System.out.println("사람이 책을 읽습니다.");
+   }
+   
+}
+
+class Tiger extends Animal {
+
+   @Override
+   public void move() {
+      System.out.println("호랑이가 네발로 뜁니다.");
+   }
+   
+   public void hunting() {
+      System.out.println("호랑이가 사냥을 합니다.");
+   }
+   
+}
+
+class Eagle extends Animal {
+
+   @Override
+   public void move() {
+      System.out.println("독수리가 하늘을 날아 다닙니다.");
+   }
+   
+   public void flying() {
+      System.out.println("독수리가 양날개를 쭉 펴고 날아 다닙니다.");
+   }
+   
+}
+
+public class AnimalTest {
+
+   public static void main(String[] args) {
+      Animal h = new Human();
+      Animal t = new Tiger();
+      Animal e = new Eagle();
+      
+      AnimalTest test = new AnimalTest();
+      
+      ArrayList<Animal> animalList = new ArrayList<>();
+      animalList.add(h);
+      animalList.add(e);
+      animalList.add(t);
+      
+      for (Animal animal : animalList) {
+         animal.move();
+      }
+      
+      test.testDownCasting(animalList);
+      
+   }
+   
+   public void testDownCasting(ArrayList<Animal> list) {
+      for(int i = 0; i< list.size(); i++) {
+         Animal animal = list.get(i);
+         
+         if(animal instanceof Human) {
+            Human human = (Human)animal;
+            human.readBook();
+         }
+         else if(animal instanceof Tiger) {
+            Tiger tiger = (Tiger)animal;
+            tiger.hunting();
+         }
+         else if(animal instanceof Eagle) {
+            Eagle eagle = (Eagle)animal;
+            eagle.flying();
+         }
+         else {
+            System.out.println("X");
+         }
+      }
+   }
+   
+   public void moveAnimal(Animal animal) {
+      animal.move();
+   }
+}
+```
+
+### 출력결과
+```console
+사람이 걷습니다.
+독수리가 하늘을 날아 다닙니다.
+호랑이가 네발로 뜁니다.
+사람이 책을 읽습니다.
+독수리가 양날개를 쭉 펴고 날아 다닙니다.
+호랑이가 사냥을 합니다.
+```
+
+- 다운캐스팅을 사용하면 코드가 많이 지저분해지고 각 타입으로 다시 되돌려야하는 경우가 많이 있습니다.
+- 다형성을 사용하는 방법이 더 좋지만 반드시 원래 타입으로 되돌여야하는 경우는 instanceof를 사용하여 확인한 다음에 하면 됩니다.
+
+# 추상 클래스란?
+- 구현 코드 없이 메서드의 선언만 있는 추상 메서드(abstract method)를 포함한 클래스입니다.
+- 메서드 선언(declaration): 반환타입, 메서드 이름, 매개변수로 구성합니다.
+- 메서드 정의(definition): 메서드 구현과 동일한 의미 구현부를 가집니다.
+- 예시
+	```java
+	int add(int x, int y); // 선언
+	int add(int x, int y){} // 구현부 o, 추상메서드 x
+	```
+- abstract 예약어를 사용합니다.
+- 추상 클래스는 new할 수 없습니다.(인스턴스화 할 수 없습니다.)
+
+## 추상클래스 구현하기
+- 메서드에 구현 코드가 없으면 abstract로 선언합니다.
+- abstract로 선언된 메서드를 가진 클래스는 abstract로 선언합니다.
+- 모든 메서드가 구현된 클래스라도 abstract로 선언되면 추상클래스로 인스턴스화 할 수 없습니다.
+- 추상 클래스의 추상메서드는 하위 클래스가 상속하여 구현합니다.
+- 추상 클래스 내의 추상 메서드 : 하위 클래스가 구현해야 하는 메서드입니다.
+- 추상 클래스 내의 구현된 메서드 : 하위 클래스가 공통으로 사용하는 메서드(필요에 따라 하위 클래스에서 재정의 합니다.)
+
+### Computer.java
+```java
+public abstract class Computer {
+   // 추상 클래스는 상속을 위한 클래스
+   
+   public abstract void display();
+   public abstract void typing();
+   
+   public void turnOn() {
+      System.out.println("전원을 켭니다.");
+   }
+   
+   public void turnOff() {
+      System.out.println("전원을 끕니다.");
+   }
+}
+```
+
+### Desktop.java
+```java
+public class Desktop extends Computer {
+
+   // Desktop 클래스를 abstract를 사용하여 추상 클래스로 선언할 수 있습니다.
+   // 하지만 추상 클래스로 선언하게 되면 이 클래스는 new를 할 수 없습니다.
+   // 추상 클래스는 상속을 하기 위해서 만든 클래스입니다.
+   // 추상 클래스안에 구현하는 메서드들은 일부는 구현을 할 수 있도 있고 일부는 구현을 안할 수도 있습니다. 어떤 경우는 다 안할 수도 있습니다.
+   // 이 클래스는 상속만을 하기 위한 클래스입니다.
+   
+   @Override
+   public void display() {
+      System.out.println("Desktop display");      
+   }
+
+   @Override
+   public void typing() {
+      System.out.println("Desktop typing");
+   }
+
+   @Override
+   public void turnOff() {
+      System.out.println("Desktop turnOff");
+   }
+}
+```
+
+### NoteBook.java
+```java
+public abstract class NoteBook extends Computer{
+
+   @Override
+   public void display() {
+      System.out.println("NoteBook display");
+   }
+
+}
+```
+
+### MyNoteBook.java
+```java
+public class MyNoteBook extends NoteBook {
+
+   @Override
+   public void typing() {
+      System.out.println("MyNoteBook typing");
+   }
+
+}
+```
+
+### ComputerTest.java
+```java
+public class ComputerTest {
+
+   public static void main(String[] args) {
+      Computer desktop = new Desktop();
+//    Computer computer = new Computer(); error
+      
+      desktop.display();
+   }
+
+}
+```
