@@ -2625,3 +2625,157 @@ public class ComputerTest {
 ##final 키워드가 변수로 쓰이면 상수, 메서드에 쓰이면 재정의를 못하는 메서드, 클래스에 쓰이면 상속이 안되는 클래스##
 
 ## 템플릿 메서드 예제
+### Car.java
+```java
+public abstract class Car {
+   public abstract void drive();
+   public abstract void stop();
+   public abstract void wiper();
+   
+   public void startCar() {
+      System.out.println("시동을 켭니다.");
+   }
+   
+   public void turnOff() {
+      System.out.println("시동을 끕니다.");
+   }
+   
+   public void washCar() {} // 추상메서드가 아니라 구현된 메서드인데 구현 내용이 없는 것. 필요한 경우 재정의를 하여 사용.
+   
+   final public void run() {
+      startCar();
+      drive();
+      wiper();
+      stop();
+      turnOff();
+      washCar();
+   }
+}
+```
+
+### AICar.java
+```java
+public class AICar extends Car {
+
+   @Override
+   public void drive() {
+      System.out.println("자율 주행을 합니다.");
+      System.out.println("자동차가 스스로 방향을 바꿉니다.");
+   }
+
+   @Override
+   public void stop() {
+      System.out.println("장애물 앞으로 스스로 멈춥니다.");
+   }
+
+   @Override
+   public void wiper() {
+      
+   }
+
+   @Override
+   public void washCar() { // 훅메서드. 필요한 경우에 상위 클래스에서 써놓은 메서드를 재정의해서 사용.
+      System.out.println("자동 세차를 합니다.");
+   }
+}
+```
+
+### ManualCar.java
+```java
+public class ManualCar extends Car {
+
+   @Override
+   public void drive() {
+      System.out.println("사람이 운전합니다.");
+      System.out.println("사람이 핸들을 조작합니다.");
+   }
+
+   @Override
+   public void stop() {
+      System.out.println("장애물 앞에서 브레이크를 밟아서 정지합니다.");
+   }
+
+   @Override
+   public void wiper() { }
+
+}
+```
+
+### CarTest.java
+```java
+public class CarTest {
+
+   public static void main(String[] args) {
+      Car aiCar = new AICar();
+      aiCar.run();
+      
+      System.out.println("===================");
+      
+      Car mCar = new ManualCar();
+      mCar.run();
+   }
+}
+```
+
+### 출력결과
+```console
+시동을 켭니다.
+자율 주행을 합니다.
+자동차가 스스로 방향을 바꿉니다.
+장애물 앞으로 스스로 멈춥니다.
+시동을 끕니다.
+자동 세차를 합니다.
+===================
+시동을 켭니다.
+사람이 운전합니다.
+사람이 핸들을 조작합니다.
+장애물 앞에서 브레이크를 밟아서 정지합니다.
+시동을 끕니다.
+```
+
+## final예약어
+- final 변수 : 값이 변경될 수 없는 상수
+```java
+public static final double PI = 3.14;
+```
+- final메서드 : 하위 클래스에서 재정의할 수 없는 메서드
+- final클래스 : 상속할 수 없는 클래스
+
+## 여러 자바 파일에서 사용하는 상수 값 정의
+### Define.java
+```java
+public class Define {
+	public static final int MIN = 1;
+	public static final int MAX = 999999;
+	public static final double PI = 3.14;
+	public static final String GREETING = "Good Morning";
+	public static final int MATH_CODE = 1001;
+	public static final int CHEMISTRY_CODE = 1002;
+}
+```
+### UsingDefine.java
+```java
+public class UsingDefine {
+	public static void main(String[] args) {
+		System.out.println(Define.GREETING);
+		System.out.println(Define.MIN);
+		System.out.println(Define.MAX);
+		System.out.println(Define.MATH_CODE);
+		System.out.println(Define.CHEMISTRY_CODE);
+		System.out.println("원주율은 " + Define.PI + "입니다.");
+ }
+}
+```
+
+# 인터페이스(interface)
+## 인터페이스란?
+- 모든 메서드가 추상 메서드로 선언됩니다. public abstract
+- 모든 변수는 상수로 선언됩니다.
+
+```java
+interface 인터페이스 이름 {
+	public static final float pi = 3.14F;
+	public void makeSomething();
+}
+```
+- 자바8 부터 디폴트 메서드(default method)와 정적 메서드(static method)기능의 제공으로 일부 구현 코드가 있습니다.
