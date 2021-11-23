@@ -549,8 +549,7 @@ public | 클래스의 외부 어디서나 접근할 수 있음
 # 정보 은닉
 - private으로 제어한 멤버변수도 public메서드가 제공되면 접근 가능하지만 변수가 public으로 공개되었을 때보다 private일 때 각 변수에 대한 제한을 public메서드에서 제어할 수 있음
 <hr />
-
-### BirthDay.java
+- BirthDay
 ```java
 public class BirthDay {
 	private int day;
@@ -609,7 +608,7 @@ public class BirthDay {
 	}
 }
 ```
-### BirthDayTest.java
+- BirthDayTest
 ```java
 public class BirthDayTest {
 
@@ -932,7 +931,8 @@ Lim님의 사번 : 1001
 Woo님의 사번 : 1002
 ```
 
-```textarea
+### 출력 결과
+```console
 여러 인스턴스가 공유하는 어떠한 값이 필요할때 그것은 static을 활용한다
 ```
 
@@ -2780,3 +2780,98 @@ interface 인터페이스 이름 {
 }
 ```
 - 자바8 부터 디폴트 메서드(default method)와 정적 메서드(static method)기능의 제공으로 일부 구현 코드가 있습니다.
+
+## 인터페이스 정의와 구현하기
+선언된 메서드들은 당연히 구현코드가 없습니다.
+
+### Calc.interface
+```java
+public interface Calc {
+   double PI = 3.14;
+   int ERROR = -9999999;
+   
+   int add(int num1, int num2);
+   int substract(int num1, int num2);
+   int times(int num1, int num2);
+   int divide(int num1, int num2);
+}
+```
+
+### Calculator.java
+```java
+public abstract class Calculator implements Calc {
+
+//   4개의 메서드를 다 구현하지 않기 때문에 abstract가 되어야 합니다.
+   @Override
+   public int add(int num1, int num2) {
+      return num1 + num2;
+   }
+   @Override
+   public int substract(int num1, int num2) {
+      return num1 - num2;
+   }
+}
+```
+
+### CompleteCalc.java
+```java
+public class CompleteCalc extends Calculator {
+
+   @Override
+   public int times(int num1, int num2) {
+      return num1 * num2;
+   }
+
+   @Override
+   public int divide(int num1, int num2) {
+      if(num2 == 0) {
+         return ERROR;
+      }
+      return num1 / num2;
+   }
+   
+   public void showInfo() {
+      System.out.println("모두 구현");
+   }
+
+}
+```
+
+### CalculatorTest.java
+```java
+public class CalculatorTest {
+
+   public static void main(String[] args) {
+      
+      int n1 = 10;
+      int n2 = 2;
+      
+      Calc calc = new CompleteCalc();
+      
+      System.out.println(calc.add(n1, n2));
+      System.out.println(calc.substract(n1, n2));
+      System.out.println(calc.times(n1, n2));
+      System.out.println(calc.divide(n1, n2));
+   }
+
+}
+```
+
+### 출력결과
+```console
+12
+8
+20
+5
+```
+
+## 인터페이스 구현과 형 변환
+- 인터페이스를 구현한 클래스는 인터페이스 형으로 선언한 변수로 형 변환할 수 있습니다.
+```java
+Calc calc = new CompleteCalc();
+```
+- 상속에서의 형 변환과 동일한 의미입니다.
+- 클래스 상속과 달리 구현코드가 없으므로 여러 인터페이스를 구현할 수 있습니다. (cf. extends)
+- 형 변환되는 경우 인터페이스에 선언된 메서드만을 사용가능합니다.
+
+
