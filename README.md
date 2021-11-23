@@ -2890,3 +2890,224 @@ Calc calc = new CompleteCalc();
 ## 인터페이스를 활용한 dao구현하기
 - DB에 회원 정보를 넣는 dao(data access object)를 여러 DB제품이 지원될 수 있게 구현합니다.
 - 환경파일(db.properties)에서 DB의 종류에 대한 정보를 읽고 그 정보에 맞게 dao인스턴스를 생성하여 실행될 수 있게 합니다.
+
+![img4](./src/img/img4.PNG)
+
+### UserInfo.java
+```java
+package ch30.domain.userinfo;
+
+public class UserInfo {
+	private String userID;
+	private String userPW;
+	private String userName;
+	
+	
+	public String getUserID() {
+		return userID;
+	}
+	public void setUserID(String userID) {
+		this.userID = userID;
+	}
+	public String getUserPW() {
+		return userPW;
+	}
+	public void setUserPW(String userPW) {
+		this.userPW = userPW;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+}
+```
+
+### UserInfoDao.java
+```java
+package ch30.domain.userinfo.dao;
+
+import ch30.domain.userinfo.UserInfo;
+
+public interface UserInfoDao {
+	void insertUserInfo(UserInfo userinfo);
+	void updateUserInfo(UserInfo userinfo);
+	void deleteUserInfo(UserInfo userinfo);
+}
+```
+
+### UserInfoMySqlDao.java
+```java
+package ch30.domain.userinfo.dao.mysql;
+
+import ch30.domain.userinfo.UserInfo;
+import ch30.domain.userinfo.dao.UserInfoDao;
+
+public class UserInfoMySqlDao implements UserInfoDao {
+
+	@Override
+	public void insertUserInfo(UserInfo userinfo) {
+		System.out.println("Insert into MySQL DB userID = " + userinfo.getUserID());
+	}
+
+	@Override
+	public void updateUserInfo(UserInfo userinfo) {
+		System.out.println("Update into MySQL DB userID = " + userinfo.getUserID());
+	}
+
+	@Override
+	public void deleteUserInfo(UserInfo userinfo) {
+		System.out.println("Delete from MySQL DB userID = " + userinfo.getUserID());
+	}
+
+}
+```
+
+### UserInfoOracleDao.java
+```java
+package ch30.domain.userinfo.dao.oracle;
+
+import ch30.domain.userinfo.UserInfo;
+import ch30.domain.userinfo.dao.UserInfoDao;
+
+public class UserInfoOracleDao implements UserInfoDao {
+
+	@Override
+	public void insertUserInfo(UserInfo userinfo) {
+		System.out.println("Insert into Oracle DB userID = " + userinfo.getUserID());
+	}
+
+	@Override
+	public void updateUserInfo(UserInfo userinfo) {
+		System.out.println("Update into Oracle DB userID = " + userinfo.getUserID());
+	}
+
+	@Override
+	public void deleteUserInfo(UserInfo userinfo) {
+		System.out.println("Delete from Oracle DB userID = " + userinfo.getUserID());
+	}
+
+}
+```
+
+### UserInfoClient.java
+```java
+package ch30.domain.userinfo.web.userinfo;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
+import ch30.domain.userinfo.UserInfo;
+import ch30.domain.userinfo.dao.UserInfoDao;
+import ch30.domain.userinfo.dao.mysql.UserInfoMySqlDao;
+import ch30.domain.userinfo.dao.oracle.UserInfoOracleDao;
+
+public class UserInfoClient {
+
+	public static void main(String[] args) throws IOException {
+		
+		FileInputStream fis = new FileInputStream("db.properties");
+		
+		Properties prop = new Properties();
+		prop.load(fis);
+		
+		String dbType = prop.getProperty("DBTYPE");
+		
+		UserInfo userInfo = new UserInfo();
+		userInfo.setUserID("12345");
+		userInfo.setUserPW("54321");
+		userInfo.setUserName("SJ");
+		
+		UserInfoDao userInfoDao = null;
+		
+		if(dbType.equals("ORACLE")) {
+			userInfoDao = new UserInfoOracleDao();
+		}
+		else if (dbType.equals("MYSQL")) {
+			userInfoDao = new UserInfoMySqlDao();
+		}
+		else {
+			System.out.println("db error");
+			return;
+		}
+		
+		userInfoDao.insertUserInfo(userInfo);
+		userInfoDao.updateUserInfo(userInfo);
+		userInfoDao.deleteUserInfo(userInfo);
+	}
+
+}
+```
+
+### db.properites (프로젝트 안에 파일 생성)
+```textarea
+DBTYPE=ORACLE
+```
+
+# 인터페이스의 여러가지 요소
+## 상수
+- 모든 변수는 상수로 변환됩니다. (public static final)
+
+```java
+double PI = 3.14;
+int ERROR = -999999;
+```
+
+## 추상 메서드
+- 모든 선언된 메서드는 추상 메서드 (public abstract)
+
+## 디폴트 메서드 (자바 8이후)
+- 구현을 가지는 메서드, 인터페이스를 구현하는 클래스들에서 공통으로 사용할 수 있는 기본 메서드입니다.
+- default 키워드를 사용합니다.
+
+```java
+default void description() {
+	System.out.println("정수 계산기를 구현합니다.");
+	myMethod();
+}
+```
+
+- 구현하는 클래스에서 재정의 할 수 있습니다.
+
+```java
+@Override
+public void description() {
+	System.out.println("CompleteCalc에서 재정의한 default 메서드");
+	// super.description();
+}
+```
+- 인터페이스를 구현한 클래스의 인스턴스가 생성되어야 사용 가능합니다.
+
+## 정적 메서드 (자바 8이후)
+- 인스턴스 생성과 상관없이 인터페이스 타입으로 사용할 수 있는 메서드입니다.
+
+```java
+static int total(int[] arr) {
+	int total = 0;
+	
+	for(int i: arr) {
+		total += i;
+	}
+	
+	mystaticMethod();
+	return total;
+}
+```
+
+## private 메서드 (자바 9이후)
+- 인터페이스를 구현한 클래스에서 사용하거나 재정의할 수 없습니다.
+- 인터페이스 내부에서만 사용하기 위해 구현하는 메서드입니다.
+- default 메서드나 static메서드에서 사용합니다.
+
+```java
+private void myMethod() {
+	System.out.println("private method");
+}
+
+
+private static void myStaticMethod() {
+	System.out.println("private static method");
+}
+```
