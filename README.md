@@ -549,7 +549,8 @@ public | 클래스의 외부 어디서나 접근할 수 있음
 # 정보 은닉
 - private으로 제어한 멤버변수도 public메서드가 제공되면 접근 가능하지만 변수가 public으로 공개되었을 때보다 private일 때 각 변수에 대한 제한을 public메서드에서 제어할 수 있음
 <hr />
-- BirthDay
+
+### BirthDay.java
 ```java
 public class BirthDay {
 	private int day;
@@ -608,7 +609,7 @@ public class BirthDay {
 	}
 }
 ```
-- BirthDayTest
+### BirthDayTest.java
 ```java
 public class BirthDayTest {
 
