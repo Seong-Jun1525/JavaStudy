@@ -10,13 +10,13 @@ public class ArrayTest2 {
 			cArr[i] = x++;
 		}
 		
-//		for(int i = 0; i < cArr.length; i++) {
-//			System.out.print(cArr[i] + " ");
-//		}
-		
-		for(char alpha : cArr) {
-			System.out.println(alpha + " " + (int)alpha);
+		for(int i = 0; i < cArr.length; i++) {
+			System.out.print(cArr[i] + " ");
 		}
+		
+//		for(char alpha : cArr) {
+//			System.out.print(alpha + " " + (int)alpha);
+//		}
 	}
 
 }
