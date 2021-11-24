@@ -3206,24 +3206,161 @@ customer order
 - extends 키워드를 사용합니다.
 - 인터페이스는 다중 상속이 가능하고 구현 코드의 상속이 아니므로 타입 상속이라고 합니다.
 
-## X.java
+### X.java
 ```java
 public interface X {
 	void x();
 }
 ```
 
-## Y.java
+### Y.java
 ```java
 public interface Y {
 	void y();
 }
 ```
 
-## MyInterface.java
+### MyInterface.java
 ```java
-public interface MyInterface extends X, Y {
+public interface MyInterface extends X, Y { // void x()와 void y()를 모두 선언하겠다는 의미
 	void myMethod();
 }
 ```
 
+### MyClass.java
+```java
+public class MyClass implements MyInterface {
+	@Override
+	public void x() {
+		System.out.println("x()");
+	}
+	
+	@Override
+	public void y() {
+		System.out.println("y()");
+	}
+	
+	@Override
+	public void myMethod() {
+		System.out.println("myMethod()");
+	}
+}
+```
+
+### MyClassTest.java
+```java
+public class MyClassTest {
+	public static void main(String[] args) {
+		MyClass mClass = new MyClass();
+		
+		X xClass = mClass;
+		xClass.x();
+		
+		Y yClass = mClass;
+		yClass.y();
+		
+		MyClass iClass = mClass;
+		iClass.x();
+		iClass.y();
+		iClass.myMethod();
+		
+	}
+}
+```
+
+## 클래스 상속과 인터페이스 구현 함께 쓰기
+- 실무에서 프레임워크나 오픈소스와 함께 연동되는 구현을 하게 되면 클래스 상속과 인터페이스의 구현을 같이 사용하는 경우가 많습니다.
+
+![img5](./src/img/img5.PNG)
+
+- 책이 순서대로 대여가 되는 도서관 구현
+- 책을 보관하는 자료 구조가 Shelf에 구현됩니다. (ArrayList)
+- Queue 인터페이스를 구현합니다. (FIFO)
+- Shelf 클래스를 상속받고 Queue를 구현합니다.
+
+### Shelf.java
+```java
+import java.util.ArrayList;
+
+public class Shelf {
+	protected ArrayList<String> shelf;
+	
+	public Shelf() {
+		shelf = new ArrayList<>();
+	}
+	
+	public ArrayList<String> getShelf() {
+		return shelf;
+	}
+	
+	public int getCount() {
+		return shelf.size();
+	}
+}
+```
+
+### Queue.java
+```java
+public interface Queue {
+	void enQueue(String title);
+	String deQueue();
+	
+	int getSize();
+}
+```
+
+### BookShelf.java
+```java
+public class BookShelf extends Shelf implements Queue {
+
+	@Override
+	public void enQueue(String title) {
+		shelf.add(title);
+	}
+
+	@Override
+	public String deQueue() {
+		return shelf.remove(0);
+	}
+
+	@Override
+	public int getSize() {
+		return getCount();
+	}
+
+}
+```
+
+### BookShelfTest.java
+```java
+public class BookShelfTest {
+
+	public static void main(String[] args) {
+		Queue bookQueue = new BookShelf();
+		
+		bookQueue.enQueue("책 1");
+		bookQueue.enQueue("책 2");
+		bookQueue.enQueue("책 3");
+		bookQueue.enQueue("책 4");
+		bookQueue.enQueue("책 5");
+		
+		System.out.println(bookQueue.getSize());
+		System.out.println(bookQueue.deQueue());
+		System.out.println(bookQueue.deQueue());
+		System.out.println(bookQueue.deQueue());
+		System.out.println(bookQueue.deQueue());
+		System.out.println(bookQueue.deQueue());
+	}
+
+}
+```
+
+### 출력 결과
+```java
+5
+책 1
+책 2
+책 3
+책 4
+책 5
+```
