@@ -2784,7 +2784,7 @@ interface 인터페이스 이름 {
 ## 인터페이스 정의와 구현하기
 선언된 메서드들은 당연히 구현코드가 없습니다.
 
-### Calc.interface
+### Calc.java
 ```java
 public interface Calc {
    double PI = 3.14;
@@ -3111,3 +3111,119 @@ private static void myStaticMethod() {
 	System.out.println("private static method");
 }
 ```
+
+# 여러 인터페이스 구현하기, 인터페이스의 상속
+## 여러 인터페이스 구현
+- 자바의 인터페이스는 구현 코드가 없으므로 하나의 클래스가 여러 인터페이스를 구현할 수 있습니다. (자바에서 클래스는 다중 상속이 가능하지 않습니다. - Diamond Problem)
+- 디폴트 메서드가 중복되는 경우는 구현하는 클래스에서 재정의 하여야 합니다.
+- 여러 인터페이스를 구현한 클래스는 인터페이스 타입으로 형 변환되는 경우 해당 인터페이스에 선언된 메서드만 사용 가능 합니다.
+
+### Buy.java
+```java
+public interface Buy {
+	void buy();
+	
+	default void order() {
+		System.out.println("buy order");
+	}
+}
+```
+
+### Sell.java
+```java
+public interface Sell {
+	void sell();
+	
+	default void order() {
+		System.out.println("sell order");
+	}
+}
+```
+
+### Customer.java
+```java
+public class Customer implements Buy, Sell {
+
+	@Override
+	public void sell() {
+		System.out.println("customer sell");
+	}
+
+	@Override
+	public void buy() {
+		System.out.println("customer buy");
+	}
+
+	@Override
+	public void order() {
+		System.out.println("customer order");
+	}
+
+	public void hello() {
+		System.out.println("hello");
+	}
+}
+```
+
+### CustomerTest.java
+```java
+public class CustomerTest {
+
+	public static void main(String[] args) {
+		Customer customer = new Customer();
+		
+		customer.buy();
+		customer.sell();
+		customer.order();
+		customer.hello();
+		
+		Buy buyer = customer;
+		buyer.buy();
+		buyer.order();
+		
+		Sell seller = customer;
+		seller.sell();
+		seller.order();
+		
+	}
+}
+```
+
+### 출력결과
+```console
+customer buy
+customer sell
+customer order
+hello
+customer buy
+customer order
+customer sell
+customer order
+```
+
+## 인터페이스의 상속
+- 인터페이스 사이에도 상속을 사용할 수 있습니다.
+- extends 키워드를 사용합니다.
+- 인터페이스는 다중 상속이 가능하고 구현 코드의 상속이 아니므로 타입 상속이라고 합니다.
+
+## X.java
+```java
+public interface X {
+	void x();
+}
+```
+
+## Y.java
+```java
+public interface Y {
+	void y();
+}
+```
+
+## MyInterface.java
+```java
+public interface MyInterface extends X, Y {
+	void myMethod();
+}
+```
+
