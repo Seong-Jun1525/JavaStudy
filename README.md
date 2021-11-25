@@ -549,16 +549,18 @@ public | 클래스의 외부 어디서나 접근할 수 있음
 # 정보 은닉
 - private으로 제어한 멤버변수도 public메서드가 제공되면 접근 가능하지만 변수가 public으로 공개되었을 때보다 private일 때 각 변수에 대한 제한을 public메서드에서 제어할 수 있음
 <hr />
-- BirthDay
+
+### BirthDay.java
+
 ```java
 public class BirthDay {
 	private int day;
 	private int month;
 	private int year;
 	
-//	public 이나 접근제어지시자 없이 사용하는 것처럼 다 오픈해서 사용하면
-//	멤버변수의 잘못된 사용으로 객체가 잘못 사용되는 것을 노출하게 되고 객체의 어떤 역할에대해서 문제가 생길 수 있다.
-//	그래서 private로 막고 메서드에서 제어를 해주게 되면 쓸데없는 데이터 오용이 막아진다.
+	//	public 이나 접근제어지시자 없이 사용하는 것처럼 다 오픈해서 사용하면
+	//	멤버변수의 잘못된 사용으로 객체가 잘못 사용되는 것을 노출하게 되고 객체의 어떤 역할에대해서 문제가 생길 수 있다.
+	//	그래서 private로 막고 메서드에서 제어를 해주게 되면 쓸데없는 데이터 오용이 막아진다.
 	
 	private boolean isValid; // default 값으로 false를 갖는다
 	
@@ -608,7 +610,8 @@ public class BirthDay {
 	}
 }
 ```
-- BirthDayTest
+
+### BirthDayTest.java
 ```java
 public class BirthDayTest {
 
@@ -730,8 +733,8 @@ ch13.Person@123a439b
 - 협력을 위해서는 필요한 메세지를 전송하고 이를 처리하는 기능이 구현되어야 함
 - 매개변수로 객체가 전달되는 경우가 발생
 
-### review
-- Student
+## review
+### Student.java
 ```java
 public class Student {
 	String studentName;
@@ -752,7 +755,7 @@ public class Student {
 	}
 }
 ```
-- Taxi
+### Taxi.java
 ```java
 public class Taxi {
 	String taxiName;
@@ -772,7 +775,7 @@ public class Taxi {
 }
 ```
 
-- TakeTransTest
+### TakeTransTest.java
 ```java
 public class TakeTransTest {
 
@@ -833,7 +836,8 @@ public class Employee {
 	}
 }
 ```
-### EmployeeTest
+
+### EmployeeTest.java
 ```java
 public class EmployeeTest {
 
@@ -1102,7 +1106,7 @@ public class CompanyTest {
 ```
 
 # static과 싱글톤 패턴 복습
-## CarFactory
+## CarFactory.java
 ```java
 public class CarFatory {
 	private static CarFatory instance = new CarFatory();
@@ -1123,7 +1127,7 @@ public class CarFatory {
 	}
 }
 ```
-## Car
+## Car.java
 ```java
 public class Car {
 
@@ -1145,7 +1149,7 @@ public class Car {
 	}
 }
 ```
-## CarFactoryTest
+## CarFactoryTest.java
 ```java
 public class CarFatoryTest {
 
@@ -1590,8 +1594,8 @@ ch18.Book@7637f22
 
 ## 2차원 배열 예제
 ```java
-int[][] arr = new int[2][3]
-int[][] arr = {{1, 2, 3}, {4, 5, 6}}
+int[][] arr = new int[2][3];
+int[][] arr = {{1, 2, 3}, {4, 5, 6}};
 ```
 
 ###  TwoDimenstionTest.java
@@ -1775,9 +1779,9 @@ Woo 학생의 총점은 255점 입니다.
 ```
 
 - 상속의 문법
-- ```java
+```java
 class B extends A {
-
+	...
 }
 ```
 
@@ -1798,7 +1802,8 @@ C++같은 경우는 여러개가 올 수 있는데 이러면 모호성이 발생
 # 상속을 활용한 멤버쉽 클래스 구현하기
 ## 멤버쉽 시나리오
 ```textarea
-회사에서 고객 정보를 활용한 맞춤 서비스를 하기 위해 일반고객과 이보다 충성도가 높은 우수고객에 따른 서비스를 제공하고자 합니다.
+회사에서 고객 정보를 활용한 맞춤 서비스를 하기 위해 일반고객과 이보다 충성도가 높은 우수고객에 따른 서비스를
+제공하고자 합니다.
 
 물품을 구매할 때 적용되는 할인율과 적립되는 보너스 포인트의 비율이 다릅니다.
 여러 멤버쉽에 대한 각각 다양한 서비스를 제공할 수 있습니다.
@@ -2091,12 +2096,10 @@ Woo님의 등급은 VIP이며, 보너스 포인트는 10000입니다.
 ## 형 변환(업 캐스팅)
 - 상위 클래스로 변수를 선언하고 하위 클래스의 생성자로 인스턴스를 생성합니다.
 Customer customerLim = new VIPCustomer();
-- 상위 클래스 타입의 변수에 하위 클래스 변수가 대입
+- 상위 클래스 타입의 변수에 하위 클래스 변수가 대입 <br/>
 VIPCustomer vCustomer = new VIPCustomer();
 addCustomer(vCustomer);
-int addCustomer(Customer customer) {
-
-}
+int addCustomer(Customer customer) { }
 - 하위 클래스는 상위 클래스의 타입을 내포하고 있으므로 상위 클래스로의 묵시적 형 변환이 가능합니다.
 - 상속관계에서 모든 하위 클래스는 상위 클래스로 형 변환이 됩니다. (그 역은 성립하지 않습니다.)
 
@@ -2127,10 +2130,12 @@ public int calcPrice(int price) { // Override된 메서드이기 때문에 이�
 - 컴파일러에게 특별한 정보를 제공해주는 역할입니다.
 
 애노테이션 | 설명
+-- | --
 @Override | 재정의된 메서드라는 정보 제공합니다.
 @FunctionallInterface | 함수형 인터페이스라는 정보 제공합니다.
 @Deprecated | 이후 버전에서 사용되지 않을 수 있는 변수, 메서드에 사용합니다.
 @SuppressWarnings | 특정 경고가 나타나지 않도록 합니다.<br />(예)@SuppressWarnings("deprecation")는 @Deprecated가 나타나지 않도록 합니다.
+
 - @overriding 애노테이션은 재정의된 메서드라는 의미로 선언부가 기존의 메서드와 다른 경우 에러가 발생합니다.
 
 ## 형 변환과 오버라이딩 메서드 호출
@@ -2175,13 +2180,13 @@ public class TestMethod {
 }
 ```
 
-![img2](./src/img/img2.PNG)
+![img2](./src/img/img2.png)
 
 ## 가상 메서드의 원리
 - 가상 메서드 테이블에서 해당 메서드에 대한 address를 가지고 있습니다.
 - 재정의된 경우는 재정의 된 메서드의 주소를 가리킵니다.
 
-![img3](./src/img/img3.PNG)
+![img3](./src/img/img3.png)
 
 # 다형성과 다형성을 사용하는 이유
 ## 다형성이란?
@@ -2280,9 +2285,9 @@ public class AnimalTest {
 호랑이가 네발로 뜁니다.
 ```
 
-코드는 한 줄 인데 어떤 데이터형이 들어갔느냐에 따라(어떤 인스턴스형이 들어갔느냐에 따라) move()의 실행이 달라집니다. 이것이 다형성입니다. <br/>
-상속을 하게 되면 하위 클래스들을 상위 클래스 하나의 타입으로 모두 핸들링 할 수 있습니다. 클래스간의 결합도가 굉장히 높아집니다. <br/>
-하지만 상위 클래스를 바꾸면 하위 클래스에 영향을 미칠 수 있습니다. 그래서 상속을 설계할 때는 꼭 필요한 경우 신중하게 설계를 해야합니다. <br/><br/>
+- 코드는 한 줄 인데 어떤 데이터형이 들어갔느냐에 따라(어떤 인스턴스형이 들어갔느냐에 따라) move()의 실행이 달라집니다. 이것이 다형성입니다.
+- 상속을 하게 되면 하위 클래스들을 상위 클래스 하나의 타입으로 모두 핸들링 할 수 있습니다. 클래스간의 결합도가 굉장히 높아집니다.
+- 하지만 상위 클래스를 바꾸면 하위 클래스에 영향을 미칠 수 있습니다. 그래서 상속을 설계할 때는 꼭 필요한 경우 신중하게 설계를 해야합니다.
 
 ## 다형성을 사용하는 이유?
 - 다른 동물을 추가하는 경우
@@ -2623,7 +2628,7 @@ public class ComputerTest {
 - 프레임워크에서 많이 사용되는 설계 패턴
 - 추상 클래스로 선언된 상위 클래스에서 템플릿 메서드를 활용하여 전체적인 흐름을 정의하고 하위 클래스에서 다르게 구현되어야 하는 부분은 추상 메서드로 선언하여 하위 클래스에서 구현 하도록 합니다.
 
-##final 키워드가 변수로 쓰이면 상수, 메서드에 쓰이면 재정의를 못하는 메서드, 클래스에 쓰이면 상속이 안되는 클래스##
+**final 키워드가 변수로 쓰이면 상수, 메서드에 쓰이면 재정의를 못하는 메서드, 클래스에 쓰이면 상속이 안되는 클래스**
 
 ## 템플릿 메서드 예제
 ### Car.java
@@ -3363,4 +3368,312 @@ public class BookShelfTest {
 책 3
 책 4
 책 5
+```
+
+# Review
+## 추상 클래스와 템플릿 메서드
+```textarea
+Player가 있고 Player는 GameLevel 속성을 가집니다. 각 GameLevel 단계마다 run(), jump(), turn() 세 가지 기능이 업그레이드 됩니다.
+초보자 레벨 : 천천히 달립니다. run()만 가능
+중급자 레벨 : 빠르게 달리고 점프할 수 있습니다. run(), jump() 가능
+고급자 레벨 : 엄청 빠르게 달리고 높게 점프하고 턴할 수 있습니다. run(), jump(), turn() 가능
+
+Player는 한번에 하나의 레벨 상태만을 가질 수 있습니다.
+
+Player가 play() 중에 레벨에 있는 go(int count)라는 메서드를 호출하면 run()하고 count() 횟수만큼 jump()하고 turn()합니다.
+다음 클래스 다이어그램을 참고하여 각 레벨에서 go()가 호출 될 때 다음과 같이 출력되도록 하세요.
+```
+
+![img6](./src/img/img6.png)
+
+### Player.java
+```java
+public class Player {
+	private PlayerLevel level; // 보안을 위해 private로 선언
+	
+	public Player() { // 초기 레벨 설정
+		level = new BeginnerLevel();
+		level.showLevelMessage();
+	}
+	
+	public PlayerLevel getLevel() {
+		return level;
+	}
+
+	public void play(int i) {
+		level.go(i);
+	}
+
+	public void upgradeLevel(PlayerLevel level) {
+		this.level = level; // 현재 level에 main에서 생성한 생성자가 upgradeLevel메서드를 호출하고 매개변수값을 받아서 그 변수값을 대입한다.
+		level.showLevelMessage();
+	}
+}
+```
+
+### PlayerLevel.java
+```java
+public abstract class PlayerLevel {
+	public abstract void run();
+	
+	public abstract void jump();
+	
+	public abstract void turn();
+	
+	public abstract void showLevelMessage();
+	
+	final void go(int count) {
+		run();
+		for(int i = 0; i < count; i++) {
+			jump();
+		}
+		turn();
+	}
+}
+```
+
+### BeginnerLevel.java
+```java
+public class BeginnerLevel extends PlayerLevel {
+
+	@Override
+	public void run() {
+		System.out.println("천천히 달립니다.");
+	}
+
+	@Override
+	public void jump() {
+		System.out.println("못합니다.");
+		
+	}
+
+	@Override
+	public void turn() {
+		System.out.println("못합니다.");
+	}
+
+	@Override
+	public void showLevelMessage() {
+		System.out.println("===== 초급자 레벨 =====");
+	}
+
+}
+```
+
+### AdvancedLevel.java
+```java
+public class AdvancedLevel extends PlayerLevel {
+
+	@Override
+	public void run() {
+		System.out.println("빨리 달립니다.");
+	}
+
+	@Override
+	public void jump() {
+		System.out.println("높이 jump 합니다.");
+	}
+
+	@Override
+	public void turn() {
+		System.out.println("못합니다.");
+	}
+
+	@Override
+	public void showLevelMessage() {
+		System.out.println("===== 중급자 레벨 =====");
+	}
+
+}
+```
+
+### SuperLevel.java
+```java
+public class SuperLevel extends PlayerLevel {
+
+	@Override
+	public void run() {
+		System.out.println("엄청 빨리 달립니다.");
+	}
+
+	@Override
+	public void jump() {
+		System.out.println("높이 jump합니다.");
+	}
+
+	@Override
+	public void turn() {
+		System.out.println("turn 합니다.");
+	}
+
+	@Override
+	public void showLevelMessage() {
+		System.out.println("===== 상급자 레벨 =====");
+	}
+
+}
+```
+
+### MainBoard.java
+```java
+public class MainBoard {
+
+	public static void main(String[] args) {
+		Player player = new Player();
+		
+		player.play(1);
+		
+		AdvancedLevel aLevel = new AdvancedLevel();
+		player.upgradeLevel(aLevel);
+		player.play(2);
+		
+		SuperLevel sLevel = new SuperLevel();
+		player.upgradeLevel(sLevel);
+		player.play(3);
+		
+	}
+
+}
+```
+
+### 출력결과
+```console
+===== 초급자 레벨 =====
+천천히 달립니다.
+못합니다.
+못합니다.
+===== 중급자 레벨 =====
+빨리 달립니다.
+높이 jump 합니다.
+높이 jump 합니다.
+못합니다.
+===== 상급자 레벨 =====
+엄청 빨리 달립니다.
+높이 jump합니다.
+높이 jump합니다.
+높이 jump합니다.
+turn 합니다.
+```
+
+## 인터페이스를 활용한 정책 프로그래밍
+```textarea
+고객 센터에 전화 상담을 하는 상담원들이 있습니다. 일단 고객에게서 전화가 오면 대기열에 저장되고 각 상담원에게 배분됩니다.
+배분이 되는 정책은 크게 세 가지가 있습니다.
+	1. 모든 상담원이 동일한 상담 건수를 처리하도록 상담원 순서대로 배분합니다.
+	2. 쉬고 있거나 상담원에게 할당된 통화 수가 가장 적은 상담원에게 배분합니다.
+	3. 고객의 등급에 따라 등급이 높은 고객은 업무 능력이 우수한 상담원에게 배분합니다.
+세 가지 정책은 필요에 따라 바뀌어 운영될 수 있습니다. 다음 클래스 다이어드램을 참고하여 각 배분 규칙이 적용되도록 구현해 보세요
+```
+
+![img7](./src/img/img7.png)
+
+테스트 프로그램은 문자를 입력받아 입력되는 문자에 따라 배분 규칙을 수행하도록 합니다.
+### SchedulerTest.java
+```java
+import java.io.IOException;
+
+public class SchedulerTest {
+
+	public static void main(String[] args) throws IOException {
+		System.out.println("전화 상담원 할당 방식을 선택하세요.");
+		System.out.println("R : 한명씩 차례대로");
+		System.out.println("L : 대기가 적은 상담원 우선");
+		System.out.println("P : 우선순위가 높은 고객 우선 숙련도 높은 상담원");
+		
+		int ch = System.in.read();
+		
+		Scheduler scheduler = null;
+		
+		if (ch == 'R' || ch == 'r') {
+			scheduler = new RoundRobin();
+		}
+		else if (ch == 'L' || ch == 'l') {
+			scheduler = new LeastJob();
+		}
+		else if (ch == 'P' || ch == 'p') {
+			scheduler = new PriorityAllocation();
+		}
+		else {
+			System.out.println("잘못입력하셨습니다.");
+			return;
+		}
+		
+		scheduler.getNextCall();
+		scheduler.sendCallToAgent();
+	}
+
+}
+```
+
+### Scheduler.java
+```java
+public interface Scheduler {
+
+	void getNextCall();
+
+	void sendCallToAgent();
+
+}
+```
+
+### RoundRobin.java
+```java
+public class RoundRobin implements Scheduler {
+
+	@Override
+	public void getNextCall() {
+		System.out.println("상담전화를 순서대로 대기열에서 가져옵니다.");
+	}
+
+	@Override
+	public void sendCallToAgent() {
+		System.out.println("다음순서의 상담원에게 배분합니다.");
+	}
+
+}
+```
+
+### LeastJob.java
+```java
+public class LeastJob implements Scheduler {
+
+	@Override
+	public void getNextCall() {
+		System.out.println("상담전화를 대기가 적은 상담원에게 배분합니다.");
+	}
+
+	@Override
+	public void sendCallToAgent() {
+		System.out.println("대기가 적은 상담원에게 배분합니다.");
+	}
+
+}
+```
+
+### PriorityAllocation.java
+```java
+public class PriorityAllocation implements Scheduler {
+
+	@Override
+	public void getNextCall() {
+		System.out.println("상담전화를 우선순위가 높은 고객순서대로 대기열에서 가져옵니다.");
+	}
+
+	@Override
+	public void sendCallToAgent() {
+		System.out.println("숙련도 높은 상담원에게 배분합니다.");
+	}
+
+}
+```
+
+### 출력결과
+```console
+전화 상담원 할당 방식을 선택하세요.
+R : 한명씩 차례대로
+L : 대기가 적은 상담원 우선
+P : 우선순위가 높은 고객 우선 숙련도 높은 상담원
+l
+상담전화를 대기가 적은 상담원에게 배분합니다.
+대기가 적은 상담원에게 배분합니다.
 ```
