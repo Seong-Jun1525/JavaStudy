@@ -3677,3 +3677,258 @@ l
 상담전화를 대기가 적은 상담원에게 배분합니다.
 대기가 적은 상담원에게 배분합니다.
 ```
+
+# JavaStudy 4차
+# Object 클래스 - 모든 클래스의 최상위 클래스
+## java.lang 패키지
+- 프로그래밍 시 import하지 않아도 자동으로 import됩니다.
+- import.java.lang.*;
+- 많이 사용하는 기본 클래스들이 속한 패키지
+- String, Integer, System, ...
+
+## 모든 클래스는 Object클래스를 상속 받습니다.
+- java.lang.Object클래스
+- 모든 클래스의 최상위 클래스
+- 모든 클래스는 Object에서 상속받고, Object 클래스의 메서드 중 일부는 재정의해서 사용할 수 있습니다.
+- 컴파일러가 extends Object를 추가합니다.
+
+class Student => class Student extends Object
+
+## toString() 메서드
+- 객체의 정보를 String으로 바꾸어서 사용할 때 쓰입니다.
+- String이나 Integer 클래스는 이미 재정의 되어 있습니다.
+
+```java
+class Book {
+	private String title;
+	private String author;
+	
+	public Book(String title, String author) {
+		this.title = title;
+		this.author = author;
+	}
+
+	@Override
+	public String toString() {
+		return title + "," + author;
+	}
+}
+
+public class BookTest {
+
+	public static void main(String[] args) {
+		Book book = new Book("책 1", "SJ");
+		
+		System.out.println(book); // ch33.Book@7de26db8 -> toString() 메서드를 사용하면 입력한 값이 출력됩니다.
+		
+		String str = new String("test");
+		System.out.println(str); // test
+	}
+
+}
+```
+
+### toString을 사용하지 않은 출력결과
+```console
+ch33.Book@7de26db8
+test
+```
+
+### toString()을 사용한 출력결과
+```console
+책 1,SJ
+test
+```
+
+# Object 클래스의 메서드 활용
+## equals() 메서드
+- 두 인스턴스의 주소값을 비교하여 true / false를 반환합니다.
+- 재정의하여 두 인스턴스가 논리적으로 동일함의 여부를 구현합니다.
+- 인스턴스가 다르더라도 논리적으로 동일한 경우 true를 반환하도록 재정의할 수 있습니다. (같은 학번, 같은 사번, 같은 아이디의 회원, ...)
+
+## hashCode() 메서드
+- hashCode()는 인스턴스의 저장 주소를 반환합니다.
+- 힙 메모리에 인스턴스가 저장되는 방식이 hash방식입니다.
+- hash : 정보를 저장, 검색하는 자료구조입니다.
+- 자료의 특정 값(키 값)에 대한 저장 위치를 반환해주는 hash함수를 사용합니다.
+
+```java
+public class Student {
+	private int studentNum;
+	private String studentName;
+	
+	public Student(int studentNum, String studentName) {
+		this.studentNum = studentNum;
+		this.studentName = studentName;
+	}
+	
+	public String toString() {
+		return studentNum + "," + studentName;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Student) {
+			Student std = (Student)obj;
+			if(this.studentNum == std.studentNum) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return studentNum; // 이렇게 해주면 원래는 다른 값이 나오는데 같은 값이 나오게 됩니다.
+	}
+}
+```
+
+```java
+public class EqualsTest {
+
+	public static void main(String[] args) {
+		Student std1 = new Student(100, "SJ");
+		Student std2 = new Student(100, "SJ");
+		Student std3 = std1;
+		
+		System.out.println(std1 == std2); // false
+		System.out.println(std1 == std3); // true
+		
+		System.out.println(std1.equals(std2)); // false이지만 Student에서 주소는 다르지만 논리적으로 같다는 것을 재정의해주면 true가 출력됩니다.
+		
+		System.out.println(std1.hashCode());
+		System.out.println(std2.hashCode());
+		
+		// 다른값이 나옵니다.
+		System.out.println(System.identityHashCode(std1));
+		System.out.println(System.identityHashCode(std2));
+		
+		String str1 = new String("abc");
+		String str2 = new String("abc");
+		
+		System.out.println(str1.equals(str2)); // true
+		
+		System.out.println(str1.hashCode());
+		System.out.println(str2.hashCode());
+		
+		Integer i = 100;
+		System.out.println(i.hashCode()); // 100
+	}
+
+}
+```
+
+### 출력결과
+```console
+false
+true
+true
+100
+100
+2111991224
+292938459
+true
+96354
+96354
+100
+```
+
+## clone()
+- 객체의 원본을 복제하는데 사용하는 메서드입니다.
+- 생성과정의 복잡한 과정을 반복하지않고 복제할 수 있습니다.
+- clone()메서드를 사용하면 객체의 정보(멤버변수 값등 ... )가 동일한 또 다른 인스턴스가 생성되는 것이므로, 객체 지향 프로그램에서의 정보은닉, 객체 보호의 관점에서 위배될 수 있습니다.
+- 해당 클래스의 clone()메서드의 사용을 허용한다는 의미로 cloneable 인터페이스를 명시해 줍니다.
+
+### Student.java
+```java
+public class Student implements Cloneable {
+	private int studentNum;
+	private String studentName;
+	
+	public Student(int studentNum, String studentName) {
+		this.studentNum = studentNum;
+		this.studentName = studentName;
+	}
+	
+	public void setStudentName(String name) {
+		this.studentName = name;
+	}
+	
+	public String toString() {
+		return studentNum + "," + studentName;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Student) {
+			Student std = (Student)obj;
+			if(this.studentNum == std.studentNum) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		
+		return false;
+	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		// TODO Auto-generated method stub
+		return super.clone();
+	}
+
+	@Override
+	public int hashCode() {
+		return studentNum; // 이렇게 해주면 원래는 다른 값이 나오는데 같은 값이 나오게 됩니다.
+	}
+}
+```
+
+### EualsTest.java
+```java
+public class EqualsTest {
+
+	public static void main(String[] args) throws CloneNotSupportedException {
+		Student std1 = new Student(100, "SJ");
+		Student std2 = new Student(100, "SJ");
+		Student std3 = std1;
+		
+		System.out.println(std1 == std2); // false
+		System.out.println(std1 == std3); // true
+		
+		System.out.println(std1.equals(std2)); // false이지만 Student에서 주소는 다르지만 논리적으로 같다는 것을 재정의해주면 true가 출력됩니다.
+		
+		System.out.println(std1.hashCode());
+		System.out.println(std2.hashCode());
+		
+//	다른값이 나옵니다.
+		System.out.println(System.identityHashCode(std1));
+		System.out.println(System.identityHashCode(std2));
+		
+		
+		std1.setStudentName("Woo");
+		Student copyStudent = (Student)std1.clone();
+		System.out.println(copyStudent);
+	}
+
+}
+```
+
+### 출력결과
+```console
+false
+true
+true
+100
+100
+2111991224
+292938459
+100,Woo
+```
