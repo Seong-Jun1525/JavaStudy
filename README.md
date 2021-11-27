@@ -3932,3 +3932,142 @@ true
 292938459
 100,Woo
 ```
+
+
+# String, StringBuilder, StringBuffer 클래스, text block
+## String 클래스
+- String 선언하기
+
+```java
+String str1 = new String("abc"); // 힙 메모리에 생성
+String str2 = "abc"; // 상수 풀에 생성. 상수 풀에 abc라는 string이 있고 그거에 주소만 가리키는 것.
+
+// 즉 위의 두 개의 인스턴스는 다른 것이다.
+```
+- 힙 메모리에 인스턴스로 생성되는 경우와 상수 풀(constant pool)에 있는 주소를 참조하는 두 가지 방법이 있습니다.
+- 힙 메모리는 생성될때마다 다른 주소 값을 가지지만, 상수 풀의 문자열은 모두 같은 주소 값을 가집니다.
+
+```java
+String str1 = new String("abc");
+String str2 = new String("abc");
+
+System.out.println(str1 == str2); // false. 힙에 따로 잡힘.
+
+String str3 = "abc";
+String str4 = "abc";
+
+System.out.println(str3 == str4); // true. 상수 풀에 있는 것을 가리키는 것.
+```
+
+- 한번 생성된 String은 불변(immutable)
+- String을 연결하면 기존의 String에 연결되는 것이 아닌 새로운 문자열이 생성됩니다. (메모리 낭비가 발생할 수도 있습니다.)
+
+### StringTest
+```java
+public class StringTest {
+
+	public static void main(String[] args) {
+		String java = new String("java");
+		String android = new String("android");
+		
+		// String클래스를 new해서 생성하게되면 Character 배열안에 들어가게 됨.
+		// final로 선언됨. 즉, 해당 String은 변할 수 없다.
+		// 상수 값도 변할 수 없다.
+		
+		System.out.println(System.identityHashCode(java));
+		java = java.concat(android);
+		
+		System.out.println(java);
+		
+		System.out.println(System.identityHashCode(java));
+	}
+
+}
+```
+
+### 출력결과
+```console
+305808283
+javaandroid
+2111991224
+```
+
+## StringBuilder, StringBuffer 활용하기
+- 내부적으로 가변적인 char[]를 멤버변수로 가집니다.
+- 문자열을 여러번 연결하거나 변경할 때 사용하면 유용합니다.
+- 새로운 인스턴스를 생성하지 않고 char[]를 변경합니다.
+- StringBuffer는 멀티 쓰레드 프로그래밍에서 동기화(synchronization)를 보장합니다. (두개 이상의 쓰레드가 같은 메모리를 접근할 때 순서가 정해집니다.)
+- 단일 쓰레드 프로그램에서는 StringBuilder 사용을 권장합니다.
+- toString() 메서드로 String을 반환합니다.
+
+### StringBuilderTest.java
+```java
+public class StringBuilderTest {
+
+	public static void main(String[] args) {
+		String java = new String("java");
+		String android = new String("android");
+		
+		StringBuilder buffer = new StringBuilder(java);
+		System.out.println(System.identityHashCode(java));
+		
+		buffer.append(android);
+		System.out.println(System.identityHashCode(java));
+		
+		String test = buffer.toString();
+		System.out.println(test);
+	}
+
+}
+```
+
+### 출력결과
+```console
+305808283
+305808283
+javaandroid
+```
+
+## text block 사용하기(java 13)
+- 문자열 """ """ 사이에 이어서 만들 수 있습니다.
+- html, json 문자열을 만드는데 유용하게 사용할 수 있습니다.
+
+### TextBlockTest.java
+```java
+public class TextBlockTest {
+
+	public static void main(String[] args) {
+		String textBlocks = """
+				Hello,
+				hi,
+				how r u
+				""";
+		
+		System.out.println(textBlocks);
+		System.out.println(getBlockOfHtml());
+	}
+	
+	public static String getBlockOfHtml() {
+		return """
+				<html>
+					<body>
+						<span>example text</span>
+					</body>
+				</html>
+				""";
+	}
+
+}
+```
+### 출력결과
+```console
+Hello,
+hi,
+how r u
+
+<html>
+	<body>
+		<span>example text</span>
+	</body>
+</html>
+```
