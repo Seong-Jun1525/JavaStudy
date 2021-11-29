@@ -4312,5 +4312,182 @@ jdk클래스: HashMap, Properties
 ## 배열 구현
 ### MyArray.java
 ```java
+public class MyArray {
+	int[] intArr;
+	int count; // 개수
+	
+	public int ARRAY_SIZE;
+	public static final int ERROR_NUM = -9999999;
+	
+	public MyArray() {
+		count = 0;
+		ARRAY_SIZE = 10;
+		intArr = new int[ARRAY_SIZE];
+	}
+	
+	public MyArray(int size) {
+		count = 0;
+		ARRAY_SIZE = size;
+		intArr = new int[size];
+	}
+	
+	public void addElement(int num) {
+		if(count >= ARRAY_SIZE) {
+			System.out.println("not enough memory");
+			return;
+		}
+		intArr[count++] = num;
+	}
+	
+	public void insertElement(int position, int num) {
+		// 이동의 수는 요소의 개수에 비례하게 됨.
+		// 개수는 고려하지 않는다. 차수만 고려한다.
+		
+		int i;
+		
+		if(position < 0 || position > count) {
+			return;
+		}
+		
+		if (count >= ARRAY_SIZE) {
+			return;
+		}
+		
+		for(i = count-1; i >= position; i--) {
+			intArr[i+1] = intArr[i];
+		}
+		
+		intArr[position] = num;
+		count++;
+	}
+	
+	public int removeElement(int position) {
+		int ret = ERROR_NUM;
+		
+		if(isEmpty()) {
+			System.out.println("Array is empty");
+			return ret;
+		}
+		if(position < 0 || position > count - 1) {
+			return ret;
+		}
+		
+		ret = intArr[position];
+		
+		for(int i = position; i < count - 1; i++) {
+			intArr[i] = intArr[i+1];
+		}
+		count--;
+		
+		return ret;
+	}
+	
+	public int getSize() {
+		return count;
+	}
+	
+	public boolean isEmpty() {
+		if(count == 0) {
+			return true;
+		}
+		else return false;
+	}
+	
+	public int getElement(int position)
+	{
+		if(position < 0 || position > count-1){
+			System.out.println("검색 위치 오류. 현재 리스트의 개수는 " + count +"개 입니다.");
+			return ERROR_NUM;
+		}
+		return intArr[position];
+	}
+	
+	public void printAll()
+	{
+		if(count == 0){
+			System.out.println("출력할 내용이 없습니다.");
+			return;
+		}
+			
+		for(int i=0; i<count; i++){
+			System.out.println(intArr[i]);
+		}
+		
+	}
+	
+	public void removeAll()
+	{
+		for(int i=0; i<count; i++){
+			intArr[i] = 0;
+		}
+		count = 0;
+	}
+}
+```
+
+### MyArrayTest.java
+```java
+public class MyArrayTest {
+
+	public static void main(String[] args) {
+		MyArray array = new MyArray();
+		array.addElement(10);
+		array.addElement(20);
+		array.addElement(30);
+		array.insertElement(1, 50);
+		array.printAll();
+		
+		System.out.println("===============");
+		array.removeElement(1);
+		array.printAll();
+		System.out.println("===============");
+			
+		array.addElement(70);
+		array.printAll();
+		System.out.println("===============");
+		array.removeElement(1);
+		array.printAll();
+		
+		System.out.println("===============");
+		System.out.println(array.getElement(2));
+	}
+
+}
+```
+
+### 출력결과
+```console
+10
+50
+20
+30
+===============
+10
+20
+30
+===============
+10
+20
+30
+70
+===============
+10
+30
+70
+===============
+70
+```
+
+# 연결리스트(LinkedList) 구현하기
+## 연결리스트 특징
+- 동일한 데이터 타입을 순서에 따라 관리하는 자료구조입니다.
+- 자료를 저장하는 노드에는 자료와 다음 요소를 가리키는 링크(포인터)가 있습니다.
+- 자료가 추가될 때 노드 만큼의 메모리를 할당 받고 이전 노드의 링크로 연결합니다.(정해진 크기가 없습니다.)
+- 연결 리스트의 i번째 요소를 찾는데 걸리는 시간은 요소의 개수에 비례합니다. (O(n))
+- jdk 클래스 : LinkedList
+
+## 연결리스트 구현
+### MyListNode.java
+```java
 
 ```
