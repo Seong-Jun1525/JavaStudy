@@ -4489,5 +4489,645 @@ public class MyArrayTest {
 ## 연결리스트 구현
 ### MyListNode.java
 ```java
+public class MyListNode {
 
+	private String data; // 자료
+	public MyListNode next; // 다음 노드를 가리키는 링크
+	
+	public MyListNode() {
+		data = null;
+		next = null;
+	}
+	
+	public MyListNode(String data) {
+		this.data = data;
+		this.next = null;
+	}
+	
+	public MyListNode(String data, MyListNode link) {
+		this.data = data;
+		this.next = link;
+	}
+	
+	public String getData() {
+		return data;
+	}
+}
+```
+
+### MyLinkedList.java
+```java
+public class MyLinkedList {
+
+	private MyListNode head;
+	int count;
+	
+	public MyLinkedList() {
+		head = null;
+		count = 0;
+	}
+	
+	public MyListNode addElement( String data ) {
+		
+		MyListNode newNode;
+		if(head == null) { //맨 처음일때
+			newNode = new MyListNode(data);
+			head = newNode;
+		}
+		else {
+			newNode = new MyListNode(data);
+			MyListNode temp = head;
+			while(temp.next != null) {
+				//맨 뒤로 가서
+				temp = temp.next;
+			}
+			temp.next = newNode;
+		}
+		count++;
+		return newNode;
+	}
+	
+	public MyListNode insertElement(int position, String data ) {
+		int i;
+		MyListNode tempNode = head;
+		MyListNode newNode = new MyListNode(data);
+		
+		if(position < 0 || position > count ) {
+			System.out.println("추가 할 위치 오류 입니다. 현재 리스트의 개수는 " + count +"개 입니다.");
+			return null;
+		}
+		
+		if(position == 0) {  //맨 앞으로 들어가는 경우
+			newNode.next = head;
+			head = newNode;
+		}
+		else{
+			MyListNode preNode = null;	
+			for(i = 0; i < position; i++){
+				preNode = tempNode;
+				tempNode = tempNode.next;
+			}
+			newNode.next = preNode.next;
+			preNode.next = newNode;
+		}
+		count++;
+		return newNode;
+	}
+	
+	public MyListNode removeElement(int position) {
+		int i;
+		MyListNode tempNode = head;
+		
+		if(position >= count) {
+			System.out.println("삭제 할 위치 오류입니다. 현재 리스트의 개수는 " + count + "개 입니다.");
+			return null;
+		}
+		
+		if(position == 0){ //맨 앞을 삭제
+			head = tempNode.next;
+		}
+		else{
+			MyListNode preNode = null;	
+			for(i = 0; i < position; i++) {
+				preNode = tempNode;
+				tempNode = tempNode.next;
+			}
+			preNode.next = tempNode.next;
+		}
+		count--;
+		System.out.println(position + "번째 항목 삭제되었습니다.");
+		
+		return tempNode;
+	}
+	
+	public String getElement(int position) {
+		int i;
+		MyListNode tempNode = head;
+		
+		if(position >= count) {
+			System.out.println("검색 위치 오류 입니다. 현재 리스트의 개수는 " + count +"개 입니다.");
+			return new String("error");
+		}
+		
+		if(position == 0) { //맨 인 경우
+
+			return head.getData();
+		}
+		
+		for(i = 0; i < position; i++) {
+			tempNode = tempNode.next;
+			
+		}
+		return tempNode.getData();
+	}
+
+	public MyListNode getNode(int position) {
+		int i;
+		MyListNode tempNode = head;
+		
+		if(position >= count) {
+			System.out.println("검색 위치 오류 입니다. 현재 리스트의 개수는 " + count +"개 입니다.");
+			return null;
+		}
+		
+		if(position == 0) {  //맨 인 경우
+
+			return head;
+		}
+		
+		for(i = 0; i < position; i++){
+			tempNode = tempNode.next;
+		}
+		return tempNode;
+	}
+
+	public void removeAll() {
+		head = null;
+		count = 0;
+		
+	}
+	
+	public int getSize() {
+		return count;
+	}
+	
+	public void printAll() {
+		if(count == 0) {
+			System.out.println("출력할 내용이 없습니다.");
+			return;
+		}
+		
+		MyListNode temp = head;
+		while(temp != null) {
+			System.out.print(temp.getData());
+			temp = temp.next;
+			if(temp != null) {
+				System.out.print("->");
+			}
+		}
+		System.out.println("");
+	}
+	
+	public boolean isEmpty() {
+		if(head == null) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+}
+```
+
+### MyLinkedListTest.java
+```java
+public class MyLinkedListTest {
+
+	public static void main(String[] args) {
+
+		MyLinkedList list = new MyLinkedList();
+		list.addElement("A");
+		list.addElement("B");
+		list.addElement("C");
+		list.printAll();
+		list.insertElement(3, "D");
+		list.printAll();
+		list.removeElement(0);
+		list.printAll();
+		list.removeElement(1);
+		list.printAll();
+						
+		list.insertElement(0, "A-1");
+		list.printAll();
+		System.out.println(list.getSize());
+		
+		list.removeElement(0);
+		list.printAll();
+		System.out.println(list.getSize());
+		
+		list.removeAll();
+		list.printAll();
+		list.addElement("A");
+		list.printAll();
+		System.out.println(list.getElement(0));
+		list.removeElement(0);
+	}
+}
+```
+
+# 스택(Stack) 구현하기
+## Stack의 특징
+- 맨 마지막의 위치(top)에서만 자료를 추가, 삭제, 꺼내올 수 있습니다. (중간의 자료를 꺼낼 수 없습니다.)
+- Last In First Out (후입선출)구조입니다.
+- 택배상자가 쌓여 있는 모양이라고 생각하면 이해하기 쉽습니다.
+- 가장 최근의 자료를 찾아오거나 게임에서 히스토리를 유지하고 이르 무를때 사용할 수 있습니다.
+- 함수의 메모리는 호출 순서에 따른 stack구조입니다.
+- jdk 클래스: Stack
+
+## 배열을 활용하여 Stack 구현하기
+### MyArrayStack.java
+```java
+import ch37.MyArray;
+
+public class MyArrayStack {
+	MyArray arrayStack;
+	int top;
+	
+	public MyArrayStack() {
+		top = 0;
+		arrayStack = new MyArray();
+	}
+	
+	public MyArrayStack(int size) {
+		top = 0;
+		arrayStack = new MyArray(size);
+	}
+	
+	public void push(int data) {
+		// 배열일 경우는 꽉 찼는지 확인을 해야한다.
+		if(isFull()) {
+			System.out.println("Stack is Full");
+			return;
+		}
+		arrayStack.addElement(data);
+		top++;
+	}
+	
+	public int pop() {
+		if(isEmpty()) { // 데이터가 비어있을 경우
+			System.out.println("Stack is Empty");
+			return MyArray.ERROR_NUM;
+		}
+		return arrayStack.removeElement(--top);
+	}
+	
+	public int peek() {
+		if(isEmpty()) { // 데이터가 비어있을 경우
+			System.out.println("Stack is Empty");
+			return MyArray.ERROR_NUM;
+		}
+		return arrayStack.getElement(--top);
+	}
+	
+	public boolean isFull() {
+		if(top == arrayStack.ARRAY_SIZE) {
+			return true;
+		}
+		else return false;
+	}
+	
+	public boolean isEmpty() {
+		if(top == 0) {
+			return true;
+		}
+		else return false;
+	}
+	
+	public void printAll() {
+		arrayStack.printAll();
+	}
+}
+```
+
+### MyArrayStackTest.java
+```java
+public class MyArrayStackTest {
+
+	public static void main(String[] args) {
+		MyArrayStack stack = new MyArrayStack(3);
+		stack.push(10);
+		stack.push(20);
+		stack.push(30);
+		stack.push(40);
+		
+		stack.printAll();
+		
+		System.out.println("==========");
+		System.out.println(stack.pop());
+		System.out.println(stack.pop());
+		
+		System.out.println("==========");
+		System.out.println(stack.peek());
+	}
+
+}
+```
+
+### 출력 결과
+```console
+Stack is Full
+10
+20
+30
+==========
+30
+20
+==========
+10
+```
+
+# 큐(Queue) 구현하기
+## Queue의 특징
+- 맨 앞(front)에서 자료를 꺼내거나 삭제하고 맨 뒤(rear)에서 자료를 추가합니다.
+- First In First Out (선입선출)구조입니다.
+- 일상 생활에서 일렬로 줄 서 있는 모양을 생각하면 이해하기 쉽습니다.
+- 순차적으로 입력된 자료를 순서대로 처리하는데 많이 사용되는 자료구조입니다.
+- 콜센터에 들어온 문의 전화, 메세지 큐 등에 활용됩니다.
+- jdk 클래스: ArrayList
+
+## 연결리스트를 활용하여 Queue 구현하기
+### MyLinkedQueue.java
+```java
+import ch38.MyLinkedList;
+import ch38.MyListNode;
+
+interface Queue {
+	public void enQueue(String data);
+	public String deQueue();
+	public void printQueue();
+}
+
+public class MyLinkedQueue extends MyLinkedList implements Queue {
+
+	MyListNode front;
+	MyListNode rear;
+	
+	@Override
+	public void enQueue(String data) {
+		MyListNode newNode;
+		if(isEmpty()) {
+			// 비어있는 큐에 맨 처읆으로 들어가는 경우
+			newNode = addElement(data);
+			front = newNode;
+			rear = newNode;
+		}
+		else {
+			// 맨 뒤로 들어가는 경우
+			newNode = addElement(data);
+			rear = newNode;
+		}
+		
+		System.out.println(newNode.getData() + " added");
+	}
+
+	@Override
+	public String deQueue() {
+		if(isEmpty()) {
+			return null;
+		}
+		String data = front.getData();
+		front = front.next;
+		
+		if(front == null) { // 마지막 항목이라는 의미
+			rear = null;
+		}
+		return data;
+	}
+
+	@Override
+	public void printQueue() {
+		printAll();
+	}
+
+}
+```
+
+### MyListQueueTest.java
+```java
+public class MyListQueueTest {
+
+	public static void main(String[] args) {
+		MyLinkedQueue listQueue = new MyLinkedQueue();
+		listQueue.enQueue("A");
+		listQueue.enQueue("B");
+		listQueue.enQueue("C");
+		
+		listQueue.printAll();
+		
+		System.out.println(listQueue.deQueue());
+		System.out.println(listQueue.deQueue());
+	}
+
+}
+```
+
+### 출력 결과
+```console
+Aadded
+Badded
+Cadded
+A->B->C
+A
+B
+```
+
+# 무엇이든 담을 수 있는 제네릭(Generic) 프로그래밍
+## 제네릭 자료형 정의
+- 클래스에서 사용하는 변수의 자료형이 여러개일 수 있고, 그 기능(메서드)은 동일한 경우 클래스의 자료형을 특정하지 않고 추후 해당 클래스를 사용할 때 지정할 수 있도록 선언합니다.
+- 실제 사용되는 자료형의 변환은 컴파일러에 의해 검증되므로 안정적인 프로그래밍 방식입니다.
+- 컬렉션 프레임워크에서 많이 사용되고 있습니다.
+- 제네릭 타입을 사용하지 않는 경우의 예
+
+### 재료가 Powder인 경우
+```java
+public class ThreeDPrinter1 {
+	private Powder material;
+	
+	public void setMeterial(Powder material) {
+		this.material = material;
+	}
+	
+	public Powder getMaterial() {
+		return material;
+	}
+}
+```
+
+### 재료가 Plastic인 경우
+```java
+public class ThreeDPrinter2 { // 클래스에 1, 2같은 숫자 사용하는거 별로 좋은거 아니지만 이것은 예제여서 상관 x
+	private Plastic material;
+	
+	public void setMeterial(Plastic material) {
+		this.material = material;
+	}
+	
+	public Plastic getMaterial() {
+		return material;
+	}
+}
+```
+
+### 여러타입을 대체하기 위해 Object를 사용할 수 있습니다.
+```java
+public class ThreeDPrinter3 { // 클래스에 1, 2같은 숫자 사용하는거 별로 좋은거 아니지만 이것은 예제여서 상관 x
+	// 이 printer는 재료가 뭐든지 다 적용
+	
+	private Object material;
+	
+	public void setMeterial(Object material) {
+		this.material = material;
+	}
+	
+	public Object getMaterial() {
+		return material;
+	}
+}
+```
+
+### Object를 사용하는 경우 형 변환을 해줘야 합니다.
+```java
+Powder powder = new Powder();
+		ThreeDPrinter3 printer = new ThreeDPrinter3();
+		
+		printer.setMeterial(powder);
+		
+		Powder p = (Powder)printer.getMaterial(); // 이때 반환되는 값이 Object이기 때문에 앞에 (Powder)를 써줘서 형변환을 해야한다.
+```
+
+### GenericPrinter.java
+```java
+public class GenericPrinter<T> { // T자리에 실제적으로 사용할 자료형을 쓴다. 나중에 쓸 때
+	private T material;
+	
+	public void setMeterial(T material) {
+		this.material = material;
+	}
+	
+	public T getMaterial() {
+		return material;
+	}
+	
+	public String toString() {
+		return material.toString();
+	}
+}
+```
+- 자료형 매개변수 T(Type Parameter): 이 클래스를 사용하는 시점에 실제 사용할 자료형을 지정, static 변수는 사용할 수 없습니다.
+- GenericPrinter: 제네릭 자료형
+- E: element, K: key, V: value 등 여러 알파벳을 의미에 따라 사용 가능합니다.
+
+## 제네릭 클래스 사용하기
+### Powder.java
+```java
+public class Powder {
+	public String toString() {
+		return "재료는 Powder 입니다.";
+	}
+}
+```
+
+### Plastic.java
+```java
+public class Plastic {
+	public String toString() {
+		return "재료는 Plastic 입니다.";
+	}
+}
+```
+
+### GenericPrinter.java
+```java
+public class GenericPrinter<T> {  // T자리에 실제적으로 사용할 자료형을 쓴다. 나중에 쓸 때
+	private T material;
+	
+	public void setMeterial(T material) {
+		this.material = material;
+	}
+	
+	public T getMaterial() {
+		return material;
+	}
+	
+	public String toString() {
+		return material.toString();
+	}
+}
+```
+
+### GenericPrinterTest.java
+```java
+public class GenericPrinterTest {
+
+	public static void main(String[] args) {
+		Powder powder = new Powder();
+		
+		GenericPrinter<Powder> powderPrinter = new GenericPrinter<>(); // <> : 다이아몬드 연산자
+		powderPrinter.setMeterial(powder);
+		
+		Powder p = powderPrinter.getMaterial(); // 형변환을 하지 않는다.
+		// 형변환을 하지 않는 이유 : GenericPrinter<Powder>이렇게 작성하면 컴파일될 때 GenericPrinter 클래스에 있는 모든 T가 Powder로 바뀜.
+		
+		System.out.println(powderPrinter.toString());
+		
+	}
+
+}
+```
+
+### 출력 결과
+```console
+재료는 Powder 입니다.
+```
+
+## 다이아몬드 연산자 - <>
+- ArrayList list = new ArrayList<>(); // 다이아몬드 연산자 내부에서 자료형은 생략가능 합니다.
+- 제네릭에서 자료형 추론(자바 10부터)
+
+```java
+ArrayList list = new ArrayList<>() => var list = new ArrayList()
+```
+
+# <T extends 클래스> 사용하기
+## 상위 클래스의 필요성
+- T자료형의 범위를 제한할 수 있습니다.
+- 상위 클래스에서 선언하거나 정의하는 메서드를 활용할 수 있습니다.
+- 상속을 받지 않는 경우 T는 Object로 변환되어 Object 클래스가 기본으로 제공하는 메서드만 사용 가능합니다.
+
+## T extends를 사용한 프로그래밍
+- GenericPrinter에 material 변수의 자료형을 상속받아 구현합니다.
+- 전의 예제에서 어떤 재료를 넣어도 다 출력이 되는 형식이였는데 이렇게되면 물과 같은 재료를 넣어도 정상작동이 됩니다.
+- 그렇기 때문에 T에 무작위 클래스가 들어갈 수 없게 Material 클래스를 상속받은 클래스로 한정합니다.
+
+### Material.java
+```java
+public abstract class Material { // 직접 쓸일은 없기 때문에 abstract로 만듭니다.
+	/*
+	 * T가 사용할 여러 메서드들을 추상클래스 상위 클래스에서 미리선언을 해놓고
+	 * 이것을 구현하도록 할 수도 있고 공통되는 기능을 구현해 놓을 수도 있다.
+	 * extends T를 사용함으로써 써야하는 재료에 대해서 한정을 두고
+	 * 어떤 클래스 기반에 한 것만 넣을 수 있다는 제약도 있다.
+	 */
+	
+	public abstract void doPrinting();
+}
+```
+
+### Powder.java
+```java
+public class Powder extends Material {
+	public String toString() {
+		return "재료는 Powder 입니다.";
+	}
+
+	@Override
+	public void doPrinting() {
+		System.out.println("Powder 재료로 출력합니다.");
+	}
+}
+```
+
+### Plastic.java
+```java
+public class Plastic extends Material {
+	public String toString() {
+		return "재료는 Plastic 입니다.";
+	}
+
+	@Override
+	public void doPrinting() {
+		System.out.println("Plastic 재료로 출력합니다.");
+	}
+}
 ```
