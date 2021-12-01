@@ -5232,3 +5232,128 @@ public class GenericMethod {
 - 객체는 key-value의 쌍으로 이루어집니다.
 - key는 중복을 허용하지 않습니다.
 - HashTable, HashMap, Properties, TreeMap 등이 Map 인터페이스를 구현합니다. 
+
+# 순차적으로 자료를 관리하는 List 인터페이스를 구현한 클래스와 그 활용
+## 멤버쉽 관리하기
+- Member 클래스를 만들고, 아이디와 이름을 멤버 변수로 선언합니다.
+- Member 클래스로 생성된 인스턴스들을 관리하는 클래스를 컬렉션 프레임워크 클래스들을 활용하여 구현합니다.
+
+## ArrayList 활용하기
+- 멤버를 순차적으로 관리합니다.
+
+### Member.java
+```java
+public class Member {
+	private int memberId;
+	private String memberName;
+	
+	public Member(int memberId, String memberName) {
+		this.memberId = memberId;
+		this.memberName = memberName;
+	}
+
+	public int getMemberId() {
+		return memberId;
+	}
+
+	public void setMemberId(int memberId) {
+		this.memberId = memberId;
+	}
+
+	public String getMemberName() {
+		return memberName;
+	}
+
+	public void setMemberName(String memberName) {
+		this.memberName = memberName;
+	}
+
+	@Override
+	public String toString() {
+		return memberName + " 회원님의 아이디는 " + memberId + "입니다.";
+	}
+}
+```
+
+### MemberArrayList.java
+```java
+import java.util.ArrayList;
+
+public class MemberArrayList {
+	private ArrayList<Member> arrayList;
+	
+	public MemberArrayList() {
+		arrayList = new ArrayList<>();
+	}
+	
+	public MemberArrayList(int size) {
+		arrayList = new ArrayList<>(size);
+	}
+	
+	public void addMember(Member member) {
+		arrayList.add(member);
+	}
+	
+	public boolean removeMember(int memberId) {
+		for(int i = 0; i < arrayList.size(); i++) {
+			Member member = arrayList.get(i);
+			
+			int tempId = member.getMemberId();
+			
+			if(tempId == memberId) {
+				arrayList.remove(i);
+				return true;
+			}
+		}
+		
+		System.out.println(memberId + "가 존재하지 않습니다.");
+		return false;
+	}
+	
+	public void showAllMember() {
+		for(Member member : arrayList) {
+			System.out.println(member);
+		}
+		System.out.println();
+	}
+}
+```
+
+### MemberArrayListTest.java
+```java
+public class MemberArrayListTest {
+
+	public static void main(String[] args) {
+		MemberArrayList memberArrayList = new MemberArrayList();
+		
+		Member memberLim = new Member(1001, "Lim");
+		Member memberLee = new Member(1002, "Lee");
+		Member memberWoo = new Member(1003, "Woo");
+		Member memberKim = new Member(1004, "Kim");
+		
+		memberArrayList.addMember(memberLim);
+		memberArrayList.addMember(memberLee);
+		memberArrayList.addMember(memberWoo);
+		memberArrayList.addMember(memberKim);
+		
+		memberArrayList.showAllMember();
+		memberArrayList.removeMember(memberKim.getMemberId());
+		memberArrayList.showAllMember();
+		
+	}
+
+}
+```
+
+### 출력 결과
+```console
+Lim 회원님의 아이디는 1001입니다.
+Lee 회원님의 아이디는 1002입니다.
+Woo 회원님의 아이디는 1003입니다.
+Kim 회원님의 아이디는 1004입니다.
+
+Lim 회원님의 아이디는 1001입니다.
+Lee 회원님의 아이디는 1002입니다.
+Woo 회원님의 아이디는 1003입니다.
+```
+
