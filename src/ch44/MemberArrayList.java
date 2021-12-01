@@ -1,6 +1,7 @@
 package ch44;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class MemberArrayList {
 	private ArrayList<Member> arrayList;
@@ -17,14 +18,25 @@ public class MemberArrayList {
 		arrayList.add(member);
 	}
 	
-	public boolean removeMember(int memberId) {
-		for(int i = 0; i < arrayList.size(); i++) {
-			Member member = arrayList.get(i);
-			
+	public boolean removeMember(int memberId) { // 멤버 아이디를 매개변수로, 삭제 여부를 반환
+//		for(int i = 0; i < arrayList.size(); i++) {
+//			Member member = arrayList.get(i);
+//			
+//			int tempId = member.getMemberId();
+//			
+//			if(tempId == memberId) {
+//				arrayList.remove(i);
+//				return true;
+//			}
+//		}
+		Iterator<Member> ir = arrayList.iterator();
+		
+		while(ir.hasNext()) {
+			Member member = ir.next();
 			int tempId = member.getMemberId();
 			
-			if(tempId == memberId) {
-				arrayList.remove(i);
+			if(tempId == memberId) { // 멤버 아이디가 매개변수와 일치하면
+				arrayList.remove(member); // 해당 멤버 삭제
 				return true;
 			}
 		}
