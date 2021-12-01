@@ -5357,3 +5357,180 @@ Lee 회원님의 아이디는 1002입니다.
 Woo 회원님의 아이디는 1003입니다.
 ```
 
+# Collection 요소를 순회하는 Iterator
+## 요소의 순회란?
+- 컬렉션 프레임워크에 저장된 요소들을 하나씩 차례로 참조하는 것입니다.
+- 순서가 있는 List인터페이스의 경우는 Iterator를 사용하지 않고 get(i) 메서드를 활용할 수 있습니다.
+- Set 인터페이스의 경우 get(i)메서드가 제공되지 않으므로 Iterator를 활용하여 객체를 순회합니다.
+
+## Iterator 사용하기
+- boolean hasNext(): 이후에 요소가 더 있는지를 체크하는 메서드, 요소가 있다면 true를 반환합니다.
+- E next(): 다음에 있는 요소를 반환합니다.
+
+### MemberArrayList.java의 removeMember()메서드를 Iterator를 활용하여 구현합니다.
+```java
+	public boolean removeMember(int memberId) { // 멤버 아이디를 매개변수로, 삭제 여부를 반환
+//		for(int i = 0; i < arrayList.size(); i++) {
+//			Member member = arrayList.get(i);
+//			
+//			int tempId = member.getMemberId();
+//			
+//			if(tempId == memberId) {
+//				arrayList.remove(i);
+//				return true;
+//			}
+//		}
+		Iterator<Member> ir = arrayList.iterator();
+		
+		while(ir.hasNext()) {
+			Member member = ir.next();
+			int tempId = member.getMemberId();
+			
+			if(tempId == memberId) { // 멤버 아이디가 매개변수와 일치하면
+				arrayList.remove(member); // 해당 멤버 삭제
+				return true;
+			}
+		}
+		
+		System.out.println(memberId + "가 존재하지 않습니다.");
+		return false;
+	}
+```
+
+# 중복되지 않게 자료를 관리하는 Set 인터페이스를 구현한 클래스와 그 활용
+## HashSet 클래스
+- Set 인터페이스를 구현한 클래스
+- 멤버의 중복 여부를 체크하기 위해 인스턴스의 동일성을 확인해야 합니다.
+- 동일성 구현을 위해 필요에 따라 equals()와 hashCode() 메서드를 재정의합니다.
+
+### MemberHashSetTest.java
+```java
+public class MemberHashSetTest {
+
+	public static void main(String[] args) {
+		MemberHashSet memberHashSet = new MemberHashSet();
+		
+		Member memberLim = new Member(1001, "Lim");
+		Member memberLee = new Member(1002, "Lee");
+		Member memberWoo = new Member(1003, "Woo");
+		Member memberKim = new Member(1004, "Kim");
+		
+		memberHashSet.addMember(memberLim);
+		memberHashSet.addMember(memberLee);
+		memberHashSet.addMember(memberWoo);
+		memberHashSet.addMember(memberKim);
+		
+		Member memberHong = new Member(1004, "Hong");
+		memberHashSet.addMember(memberHong);
+		
+		memberHashSet.showAllMember();
+		
+	}
+
+}
+```
+
+### MemberHashSet.java
+```java
+import java.util.HashSet;
+import java.util.Iterator;
+
+public class MemberHashSet {
+	private HashSet<Member> hashSet;
+	
+	public MemberHashSet() {
+		hashSet = new HashSet<>();
+	}
+	
+	public MemberHashSet(int size) {
+		hashSet = new HashSet<>(size);
+	}
+	
+	public void addMember(Member member) {
+		hashSet.add(member);
+	}
+	
+	public boolean removeMember(int memberId) { // 멤버 아이디를 매개변수로, 삭제 여부를 반환
+		Iterator<Member> ir = hashSet.iterator();
+		
+		while(ir.hasNext()) {
+			Member member = ir.next();
+			int tempId = member.getMemberId();
+			
+			if(tempId == memberId) { // 멤버 아이디가 매개변수와 일치하면
+				hashSet.remove(member); // 해당 멤버 삭제
+				return true;
+			}
+		}
+		
+		System.out.println(memberId + "가 존재하지 않습니다.");
+		return false;
+	}
+	
+	public void showAllMember() {
+		for(Member member : hashSet) {
+			System.out.println(member);
+		}
+		System.out.println();
+	}
+}
+```
+
+### Member.java
+```java
+public class Member {
+	private int memberId;
+	private String memberName;
+	
+	public Member(int memberId, String memberName) {
+		this.memberId = memberId;
+		this.memberName = memberName;
+	}
+
+	public int getMemberId() {
+		return memberId;
+	}
+
+	public void setMemberId(int memberId) {
+		this.memberId = memberId;
+	}
+
+	public String getMemberName() {
+		return memberName;
+	}
+
+	public void setMemberName(String memberName) {
+		this.memberName = memberName;
+	}
+
+	@Override
+	public int hashCode() {
+		return memberId;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Member) {
+			Member member = (Member)obj;
+			if(this.memberId == member.memberId) {
+				return true;
+			}
+			else return false;
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return memberName + " 회원님의 아이디는 " + memberId + "입니다.";
+	}
+}
+```
+
+### 출력 결과
+```console
+Lim 회원님의 아이디는 1001입니다.
+Lee 회원님의 아이디는 1002입니다.
+Woo 회원님의 아이디는 1003입니다.
+Kim 회원님의 아이디는 1004입니다.
+```
