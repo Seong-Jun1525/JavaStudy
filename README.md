@@ -6003,6 +6003,250 @@ public class InnerTest {
 - 메서드의 호출이 끝나면 메서드에 사용된 지역 변수의 유효성은 사라집니다.
 - 메서드 호출 이후에도 사용해야 하는 경우가 있을 수 있으므로 지역 내부 클래스에서 사용하는 메서드의 지역 변수나 매개 변수는 final로 선언됩니다.
 
+### Outer2.java
 ```java
+class Outer2 {
+	
+	int outNum = 100; // 멤버 변수는 생성자에서 하는게 좋은 방법이지만 예제이기 때문에 그냥 함.
+	static int sNum = 200;
+	
+	Runnable getRunnable(int i) { // i는 stack 메모리에 생성
+		int num = 10; // num은 stack 메모리에 생성
+		
+		class MyRunnable implements Runnable {
+			
+			int localNum = 1000;
+			
+			@Override
+			public void run() {
+				
+//				i = 50; // error
+//				num = 20; // error
+//				가져다 출력할 때는 error가 생기지 않는다.
+//				하지만 값을 바꾸려고 하면 error가 생긴다.
+//				Error가 생기는 이유는 getRunnable() 메서드가 호출되는 시점이랑 MyRunnable클래스가 생성 주기가 다르기 때문이다.
+//				getRunnable 메서드의 호출이 끝나면 Stack 메모리에 잡힌 i와 num은 없어진다.
+//				하지만 run()메서드는 getRunnable을 받고나면 나중에 또 호출될 수 있다.
+//				그런데 또 호출되었을 때 i, num은 없을 수도 있다.
+//				없으면 그 값을 assign을 못한다. 그러면 값을 바꿔줄 수 없다.
+//				즉, i와 num은 stack메모리에 생성이 되는건데 stack에 잡히면 안된다.
+//				그래서 컴파일러가 자동으로 final로 처리한다.
+//				외부 메서드에서 있는 변수를 익명 내부 클래스안에서 쓸 때 오류가 난다.
+//				예전에는 final로 선언하라고 했지만 지금은 컴파일러가 자동으로 final로 변환해준다.
+//				즉, 스택에 잡히지 않는다. 상수메모리에 잡힌다. 그래서 값을 바꿀 수 없다.
+				
+				System.out.println("i = " + i);
+				System.out.println("num = " + num);
+				System.out.println("localNum = " + localNum);
 
+				System.out.println("outNum = " + outNum + "(외부 클래스 인스턴스 변수)");
+				System.out.println("Outer.sNum = " + Outer2.sNum + "(외부 클래스 정적 변수)");
+			}
+		}
+		
+		return new MyRunnable();
+	}
+}
+
+public class AnonumousInnerTest {
+
+	public static void main(String[] args) {
+		Outer2 out = new Outer2();
+		Runnable runner = out.getRunnable(100);
+		
+		runner.run();
+	}
+
+}
 ```
+
+### 출력 결과
+```console
+i = 100
+num = 10
+localNum = 1000
+outNum = 100(외부 클래스 인스턴스 변수)
+Outer.sNum = 200(외부 클래스 정적 변수)
+```
+
+## 익명 내부 클래스
+- 이름이 없는 클래스 (위 지격 내부 클래스의 MyRunnable 클래스 이름은 실제로 호출되는 경우가 없습니다.)
+- 클래스의 이름을 생략하고 주로 하나의 인터페이스나 하나의 추상 클래스를 구현하여 반환합니다.
+- 인터페이스나 추상 클래스 자료형의 변수에 직접 대입하여 클래스를 생성하거나 지역 내부 클래스의 메서드 내부에서 생성하여 반환할 수 있습니다.
+- widget의 이벤트 핸들러에 활용됩니다.
+
+```java
+class Outer2 {
+	
+	int outNum = 100; // 멤버 변수는 생성자에서 하는게 좋은 방법이지만 예제이기 때문에 그냥 함.
+	static int sNum = 200;
+	
+	Runnable getRunnable(int i) { // i는 stack 메모리에 생성
+		int num = 10; // num은 stack 메모리에 생성
+		
+		return new Runnable() {
+			
+			int localNum = 1000;
+			
+			@Override
+			public void run() {
+				System.out.println("i = " + i);
+				System.out.println("num = " + num);
+				System.out.println("localNum = " + localNum);
+
+				System.out.println("outNum = " + outNum + "(외부 클래스 인스턴스 변수)");
+				System.out.println("Outer.sNum = " + Outer2.sNum + "(외부 클래스 정적 변수)");
+			}
+		};
+	}
+	
+	Runnable runnable = new Runnable() {
+
+		@Override
+		public void run() {
+			System.out.println("Runnable class");
+		}
+		
+	};
+}
+
+public class AnonumousInnerTest {
+
+	public static void main(String[] args) {
+		Outer2 out = new Outer2();
+		Runnable runner = out.getRunnable(100);
+		
+		runner.run();
+		
+		out.runnable.run();
+	}
+
+}
+```
+
+### 출력 결과
+```console
+i = 100
+num = 10
+localNum = 1000
+outNum = 100(외부 클래스 인스턴스 변수)
+Outer.sNum = 200(외부 클래스 정적 변수)
+Runnable class
+```
+
+# 람다식(Lambda expression)
+## 함수형 프로그래밍과 람다식
+- 자바는 객체 지향 프로그래밍 : 기능을 수행하긴 위해서는 객체를 만들고 그 객체 내부에 멤버 변수를 선언하고 기능을 수행하는 메서드를 구현합니다.
+- 자바 8부터 함수형 프로그래밍 방식을 지원하고 이를 람다식이라고 합니다.
+- 함수의 구현과 호출만으로 프로그래밍이 수행되는 방식입니다.
+- 함수형 프로그래밍(Functional Programming: FP)
+```textarea
+함수형 프로그래밍은 순수함수(pure function)를 구현하고 호출함으로써 외부 자료에 부수적인 영향(side effect)를 주지 않도록 구현하는 방식입니다.
+순수 함수란 매개변수만을 사용하여 만드는 함수입니다. 즉, 함수 내부에서 함수 외부에 있는 변수를 사용하지 않아 함수가 수행되더라도 외부에는 영향을 주지 않습니다.
+
+함수를 기반으로 하는 프로그래밍이고 입력받는 자료 이외에 외부 자료를  사용하지 않아 여러 자료가 동시에 수행되는 병렬 처리가 가능합니다.
+함수형 프로그래밍은 함수의 기능이 자료에 독립적임을 보장합니다. 이는 동일한 자료에 대해 동일한 결과를 보장하고, 다양한 자료에 대해 같은 기능을 수행할 수 있습니다.
+```
+
+## 람다식 문법
+- 익명 함수 만들기
+- 매개 변수와 매개변수를 이용한 실행문 (매개 변수) -> {실행문;}
+- 두 수를 입력 받아 더하는 add() 함수 예
+
+```java
+int add(int x, int y) {
+	return x + y;
+}
+```
+- 람다식으로 표현
+
+```java
+(int x, int y) -> {return x + y;}
+```
+
+- 매개 변수가 하나인 경우 자료형과 ()생략 가능합니다.
+
+```java
+str -> {System.out.println(str);}
+```
+
+- 매개변수가 두 개 이상인 경우 ()를 생략할 수 없습니다.
+
+```java
+x, y -> {System.out.println(x + y);} // 오류
+```
+
+- 실행문이 한 문장인 경우 중괄호 생략 가능합니다.
+
+```java
+str -> System.out.println(str);
+```
+
+- 실행문이 한 문장이라도 return문(반환문)은 중괄호를 생략할 수 없습니다.
+
+```java
+str -> return str.length(); // 오류
+```
+
+- 실행문이 한 문장의 반환문인 경우엔 return과 중괄호를 모두 생략합니다.
+
+```java
+(x, y) -> x + y;
+str -> str.length;
+```
+
+### 예제
+```java
+public interface Add {
+	public int add(int x, int y);
+	
+}
+```
+```java
+public class AddTest {
+
+	public static void main(String[] args) {
+		Add addL = (x, y) -> {return (x + y);};
+		
+		System.out.println(addL.add(2, 3));
+	}
+
+}
+```
+```console
+5
+```
+
+# 함수형 인터페이스와 람다식 구현하여 사용하기
+## 함수형 인터페이스 선언하기
+- 람다식을 선언하기 위한 인터페이스
+- 익명 함수와 매개 변수만으로 구현되므로 인터페이스는 단 하나의 메서드만을 선언해야합니다.
+- @FunctionalInterface 애노테이션(annotation)<br/>
+  함수형 인터페이스라는 의미, 내부에 여러 개의 메서드를 선언하며 에러납니다.
+	```java
+	@FunctionalInterface
+	public interface MyNumber { // Error
+		int getMax(int n1, int n2);
+		int add(int x, int y);
+	}
+	```
+	
+- 람다식 구현과 호출
+```java
+@FunctionalInterface
+public interface MyNumber {
+	int getMax(int n1, int n2);
+}
+```
+```java
+public class MyNumberTest {
+
+	public static void main(String[] args) {
+		MyNumber myNumber = (x, y) -> x > y? x : y;
+		
+		System.out.println(myNumber.getMax(10, 20));
+	}
+
+}
+```
+
