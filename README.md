@@ -5534,3 +5534,719 @@ Lee 회원님의 아이디는 1002입니다.
 Woo 회원님의 아이디는 1003입니다.
 Kim 회원님의 아이디는 1004입니다.
 ```
+
+# 정렬을 위해 Comparable과 Comparator 인터페이스 구현하기
+## TreeSet 클래스 활용하기
+- 객체의 정렬에 사용하는 클래스
+- Set 인터페이스를 구현하여 중복을 허용하지 않고, 오름차순이나 내림차순으로 객체를 정렬할 수 있습니다.
+- 내부적으로 이진검색트리(binary search tree)로 구현됩니다.
+- 이진검색트리에 저장하기 위해 각 객체를 비교해야 합니다.
+- 비교 대상이 되는 객체에 Comparable이나 Comparator 인터페이스를 구현해야 TreeSet에 추가될 수 있습니다.
+- String, Integer 등 JDK의 많은 클래스들이 이미 Comparable을 구현했습니다.
+
+### TreeSetTest.java
+```java
+		TreeSet<String> set = new TreeSet<String>();
+		
+		set.add("Lim");
+		set.add("Woo");
+		set.add("Kim");
+		
+		System.out.println(set); // [Kim, Lim, Woo]
+```
+String 클래스는 이미 Comparable 인터페이스가 구현되어 있으므로 오름차순으로 정렬되어 출력됩니다. <br />
+
+### MemberTreeSet.java
+```java
+import java.util.Iterator;
+import java.util.TreeSet;
+
+public class MemberTreeSet {
+	private TreeSet<Member> treeSet;
+	
+	public MemberTreeSet() {
+		treeSet = new TreeSet<>();
+	}
+	
+	public void addMember(Member member) {
+		treeSet.add(member);
+	}
+	
+	public boolean removeMember(int memberId) { // 멤버 아이디를 매개변수로, 삭제 여부를 반환
+		Iterator<Member> ir = treeSet.iterator();
+		
+		while(ir.hasNext()) {
+			Member member = ir.next();
+			int tempId = member.getMemberId();
+			
+			if(tempId == memberId) { // 멤버 아이디가 매개변수와 일치하면
+				treeSet.remove(member); // 해당 멤버 삭제
+				return true;
+			}
+		}
+		
+		System.out.println(memberId + "가 존재하지 않습니다.");
+		return false;
+	}
+	
+	public void showAllMember() {
+		for(Member member : treeSet) {
+			System.out.println(member);
+		}
+		System.out.println();
+	}
+}
+```
+
+### MemberTreeSetTest.java
+```java
+public class MemberTreeSetTest {
+
+	public static void main(String[] args) {
+				
+		MemberTreeSet memberTreeSet = new MemberTreeSet();
+		
+		Member memberLim = new Member(1001, "Lim");
+		Member memberWoo = new Member(1002, "Woo");
+		Member memberAnna = new Member(1003, "Anna");
+		Member memberKim = new Member(1004, "Kim");
+		Member memberHong = new Member(1005, "Hong");
+		
+		memberTreeSet.addMember(memberLim);
+		memberTreeSet.addMember(memberWoo);
+		memberTreeSet.addMember(memberAnna);
+		memberTreeSet.addMember(memberKim);
+		memberTreeSet.addMember(memberHong);
+		
+		memberTreeSet.showAllMember(); 
+		
+	}
+
+}
+```
+
+- Member클래스가 아이디 오름차순으로 정렬되게 하기 위해 Comparable 인터페이스를 구현해야 합니다.
+
+### Member.java
+```java
+public class Member implements Comparable<Member> {
+	private int memberId;
+	private String memberName;
+	
+	public Member(int memberId, String memberName) {
+		this.memberId = memberId;
+		this.memberName = memberName;
+	}
+
+	public Member() {}
+
+	public int getMemberId() {
+		return memberId;
+	}
+
+	public void setMemberId(int memberId) {
+		this.memberId = memberId;
+	}
+
+	public String getMemberName() {
+		return memberName;
+	}
+
+	public void setMemberName(String memberName) {
+		this.memberName = memberName;
+	}
+
+	@Override
+	public int hashCode() {
+		return memberId;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Member) {
+			Member member = (Member)obj;
+			if(this.memberId == member.memberId) {
+				return true;
+			}
+			else return false;
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return memberName + " 회원님의 아이디는 " + memberId + "입니다.";
+	}
+
+//	implements Comparable<Member> 일 경우
+	@Override
+	public int compareTo(Member member) { // 자기 자신과 비교
+		if(this.memberId > member.memberId) {
+			return 1;
+		}
+		else if(this.memberId < member.memberId) {
+			return -1;
+		}
+		else {
+			return 0;
+		}
+		return (this.memberId - member.memberId); // 오름차순
+		// return (this.memberId - member.memberId) * (-1); // 내림차순
+		
+	}
+}
+```
+
+### 출력 결과
+```console
+Lim 회원님의 아이디는 1001입니다.
+Woo 회원님의 아이디는 1002입니다.
+Anna 회원님의 아이디는 1003입니다.
+Kim 회원님의 아이디는 1004입니다.
+Hong 회원님의 아이디는 1005입니다.
+```
+
+- Comparator로 구현
+
+```java
+import java.util.Comparator;
+
+public class Member implements Comparator<Member> {
+	
+	. . .
+	
+	@Override
+	public int compare(Member m1, Member m2) { // 자기 자신하고 비교대상과 비교
+		
+		return (m1.memberId - m2.memberId);
+	}
+}
+```
+
+### MemberTreeSet.java
+```java
+public MemberTreeSet() {
+	treeSet = new TreeSet<Member>(new Member()); // Comparator를 사용할 때는 꼭 이 부분에 내가 어떤 것으로 구현을 했는지 대상을 넣어줘야 한다.
+}
+```
+
+- Comparator의 활용 : 이미 Comparable이 구현된 경우 Comparator로 비교하는 방식을 다시 구현할 수 있습니다.
+
+```java
+import java.util.Comparator;
+import java.util.TreeSet;
+
+class MyCompare implements Comparator<String> {
+
+	@Override
+	public int compare(String s1, String s2) {
+		return s1.compareTo(s2) * (-1);
+	}
+}
+
+public class MemberTreeSetTest {
+
+	public static void main(String[] args) {
+		
+		TreeSet<String> set = new TreeSet<String>(new MyCompare());
+		
+		set.add("Lim");
+		set.add("Woo");
+		set.add("Kim");
+		
+		System.out.println(set); // [Kim, Lim, Woo]		
+	}
+}
+```
+
+### 출력 결과
+```console
+[Woo, Lim, Kim]
+```
+
+# 쌍(pair)으로 자료를 관리하는 Map 인터페이스를 구현한 클래스와 그 활용
+## HashMap 클래스 활용하기
+- Map 인터페이스를 구현한 클래스
+- 가장 많이 사용되는 Map 인터페이스 기반 클래스
+- key - value를 쌍으로 관리하는 메서드를 구현합니다.
+- 검색을 위한 자료구조입니다.
+- key를 이용하여 값을 저장하고 key를 이용하여 값을 꺼내오는 방식 (hash 알고리즘으로 구현됩니다.)
+- key가 되는 객체는 중복될 수 없고 객체의 유일성을 비교를 위한 equals()와 hashCode()메서드를 구현해야 합니다.
+
+### MemberHashMap.java (Member.java는 기존 Comparable과 Comparator를 하지 않은 것과 동일)
+```java
+import java.util.HashMap;
+import java.util.Iterator;
+
+public class MemberHashMap {
+	private HashMap<Integer, Member> hashMap;
+	
+	public MemberHashMap() {
+		hashMap = new HashMap<>();
+	}
+	
+	public void addMember(Member member) {
+		hashMap.put(member.getMemberId(), member);
+	}
+	
+	public boolean removeMember(int memberId) {
+		if(hashMap.containsKey(memberId)) {
+			hashMap.remove(memberId);
+		}
+		System.out.println("no element");
+		return false;
+	}
+	
+	public void showAllMember() {
+		Iterator<Integer> ir = hashMap.keySet().iterator();
+		
+		while(ir.hasNext()) {
+			int key = ir.next();
+			Member member = hashMap.get(key);
+			
+			System.out.println(member);
+		}
+	}
+}
+```
+
+### MemberHashMapSetTest.java
+```java
+import java.util.HashMap;
+
+public class MemberHashMapSetTest {
+
+	public static void main(String[] args) {
+				
+		MemberHashMap memberHashMap = new MemberHashMap();
+		
+		Member memberLim = new Member(1001, "Lim");
+		Member memberWoo = new Member(1002, "Woo");
+		Member memberAnna = new Member(1003, "Anna");
+		Member memberKim = new Member(1004, "Kim");
+		Member memberHong = new Member(1005, "Hong");
+		
+		memberHashMap.addMember(memberLim);
+		memberHashMap.addMember(memberWoo);
+		memberHashMap.addMember(memberAnna);
+		memberHashMap.addMember(memberKim);
+		memberHashMap.addMember(memberHong);
+		
+		memberHashMap.showAllMember(); 
+		
+		System.out.println();
+		HashMap<Integer, String> hashMap = new HashMap<Integer, String>();
+		
+		hashMap.put(1001, "1");
+		hashMap.put(1002, "2");
+		hashMap.put(1003, "3");
+		hashMap.put(1004, "4");
+		
+		System.out.println(hashMap);
+		
+	}
+
+}
+```
+
+### 출력 결과
+```console
+Lim 회원님의 아이디는 1001입니다.
+Woo 회원님의 아이디는 1002입니다.
+Anna 회원님의 아이디는 1003입니다.
+Kim 회원님의 아이디는 1004입니다.
+Hong 회원님의 아이디는 1005입니다.
+
+{1001=1, 1002=2, 1003=3, 1004=4}
+```
+
+## TreeMap 클래스
+- Map 인터페이스를 구현한 클래스이고 key에 대한 정렬을 구현할 수 있습니다.
+- key가 되는 클래스에 Comparable이나 Comparator 인터페이스를 구현함으로써 key-value 쌍의 자료를 key값 기준으로 정렬하여 관리할 수 있습니다.
+
+# 여러 내부 클래스의 정의와 유형
+## 내부 클래스란? (inner class)
+- 클래스 내부에 선언한 클래스로 이 클래스를 감싸고 있는 외부 클래스와 밀접한 연관이 있는 경우가 많고, 다른 외부 클래스에서 사용할 일이 거의 없는 경우에 내부 클래스로 선언해서 사용합니다.
+- 중첩 클래스라고도 합니다.
+- 내부 클래스의 종류 : 인스턴스 내부 클래스, 정적(static) 내부 클래스, 지역(local) 내부 클래스, 익명(anonymous) 내부 클래스 (많이 사용합니다.)
+
+## 인스턴스 내부 클래스
+- 내부적으로 사용할 클래스를 선언합니다. (private으로 선언하는 것을 권장합니다.)
+- 외부 클래스가 생성된 후 생성됩니다. (정적 내부 클래스와 다릅니다.)
+- private이 아닌 내부 클래스는 다른 외부 클래스에서 생성할 수 있습니다.
+
+```java
+OutClass outClass = new OutClass();
+OutClass.InClass inClass = outClass.new InClass();
+```
+
+### 인스턴스 내부 클래스의 예
+```java
+class OutClass {
+	private int num = 10;
+	private static int sNum = 20;
+	private InClass inClass;
+	
+	public OutClass() {
+		inClass = new InClass(); // 내부 클래스 생성
+	}
+	
+	private class InClass {
+		int iNum = 100;
+		// static int sInNum = 200; // Error
+		
+		void inTest() {
+			System.out.println("OutClass num = " + num + "(외부 클래스의 인스턴스 변수)");
+			System.out.println("OutClass sNum = " + sNum + "(외부 클래스의 static 변수)");
+			System.out.println("OutClass iNum = " + iNum + "(내부 클래스의 인스턴스 변수)");
+		}
+	}
+	
+	public void usingClass() {
+		inClass.inTest();
+	}
+}
+
+public class InnerTest {
+
+	public static void main(String[] args) {
+		OutClass outClass = new OutClass();
+		outClass.usingClass();
+		
+		System.out.println();
+		
+		// InClass가 private이 아닌 경우
+//		OutClass.InClass inner = outClass.new InClass();
+//		inner.inTest();
+	}
+
+}
+```
+
+## 정적 내부 클래스
+- 외부 클래스 생성과 무관하게 사용할 수 있습니다.
+- 정적 변수, 정적 메서드을 사용합니다.
+
+### 정적 내부 클래스 예
+```java
+class OutClass {
+	private int num = 10;
+	private static int sNum = 20;
+	private InClass inClass;
+	
+	public OutClass() {
+		inClass = new InClass();
+	}
+	
+	private class InClass {
+		int iNum = 100;
+		
+		void inTest() {
+			System.out.println("OutClass num = " + num + "(외부 클래스의 인스턴스 변수)");
+			System.out.println("OutClass sNum = " + sNum + "(외부 클래스의 static 변수)");
+			System.out.println("OutClass iNum = " + iNum + "(내부 클래스의 인스턴스 변수)");
+		}
+	}
+	
+	public void usingClass() {
+		inClass.inTest();
+	}
+	
+	static class InStaticClass {
+		int iNum = 100;
+		static int sInNum = 200;
+		
+		void inTest() {
+			// System.out.println("OutClass num = " + num + "(외부 클래스의 인스턴스 변수)"); // error
+			// 정적 클래스가 외부 클래스와 상관없이 만들어 질 수 있기 때문에 외부 클래스의 인스턴스 변수를 사용할 수 없습니다.(static 변수도 마찬가지이다.)
+			System.out.println("OutClass num = " + iNum + "(내부 클래스의 인스턴스 변수)");
+			System.out.println("OutClass sNum = " + sNum + "(외부 클래스의 static 변수)");
+			System.out.println("OutClass sInNum = " + sInNum + "(내부 클래스의 static 변수)");
+		}
+		
+		static void sTest() { // static 변수만 호출 가능
+			// System.out.println("OutClass num = " + iNum + "(내부 클래스의 인스턴스 변수)"); // error
+			// static 클래스의 static 메서드는 정말 이 클래스가 생성되지 않아도 호출될 수 있다. 그때는 이 변수가 생성이 안되었을 수도 있다. 그래서 사용할 수 없다.
+			System.out.println("OutClass sNum = " + sNum + "(외부 클래스의 static 변수)");
+			System.out.println("OutClass sInNum = " + sInNum + "(내부 클래스의 static 변수)");
+		}
+	}
+}
+
+public class InnerTest {
+
+	public static void main(String[] args) {
+		// 인스턴스 내부 클래스
+		OutClass outClass = new OutClass();
+		outClass.usingClass();
+		
+		System.out.println();
+		
+		// private이 아닌 경우
+//		OutClass.InClass inner = outClass.new InClass();
+//		inner.inTest();
+		
+		// 정적 내부 클래스
+		OutClass.InStaticClass sInClass = new OutClass.InStaticClass();
+		sInClass.inTest();
+		
+		System.out.println();
+		
+		OutClass.InStaticClass.sTest();
+	}
+
+}
+```
+
+## 지역 내부 클래스
+- 지역 변수와 같이 메서드 내부에서 정의하여 사용하는 클래스
+- 메서드의 호출이 끝나면 메서드에 사용된 지역 변수의 유효성은 사라집니다.
+- 메서드 호출 이후에도 사용해야 하는 경우가 있을 수 있으므로 지역 내부 클래스에서 사용하는 메서드의 지역 변수나 매개 변수는 final로 선언됩니다.
+
+### Outer2.java
+```java
+class Outer2 {
+	
+	int outNum = 100; // 멤버 변수는 생성자에서 하는게 좋은 방법이지만 예제이기 때문에 그냥 함.
+	static int sNum = 200;
+	
+	Runnable getRunnable(int i) { // i는 stack 메모리에 생성
+		int num = 10; // num은 stack 메모리에 생성
+		
+		class MyRunnable implements Runnable {
+			
+			int localNum = 1000;
+			
+			@Override
+			public void run() {
+				
+//				i = 50; // error
+//				num = 20; // error
+//				가져다 출력할 때는 error가 생기지 않는다.
+//				하지만 값을 바꾸려고 하면 error가 생긴다.
+//				Error가 생기는 이유는 getRunnable() 메서드가 호출되는 시점이랑 MyRunnable클래스가 생성 주기가 다르기 때문이다.
+//				getRunnable 메서드의 호출이 끝나면 Stack 메모리에 잡힌 i와 num은 없어진다.
+//				하지만 run()메서드는 getRunnable을 받고나면 나중에 또 호출될 수 있다.
+//				그런데 또 호출되었을 때 i, num은 없을 수도 있다.
+//				없으면 그 값을 assign을 못한다. 그러면 값을 바꿔줄 수 없다.
+//				즉, i와 num은 stack메모리에 생성이 되는건데 stack에 잡히면 안된다.
+//				그래서 컴파일러가 자동으로 final로 처리한다.
+//				외부 메서드에서 있는 변수를 익명 내부 클래스안에서 쓸 때 오류가 난다.
+//				예전에는 final로 선언하라고 했지만 지금은 컴파일러가 자동으로 final로 변환해준다.
+//				즉, 스택에 잡히지 않는다. 상수메모리에 잡힌다. 그래서 값을 바꿀 수 없다.
+				
+				System.out.println("i = " + i);
+				System.out.println("num = " + num);
+				System.out.println("localNum = " + localNum);
+
+				System.out.println("outNum = " + outNum + "(외부 클래스 인스턴스 변수)");
+				System.out.println("Outer.sNum = " + Outer2.sNum + "(외부 클래스 정적 변수)");
+			}
+		}
+		
+		return new MyRunnable();
+	}
+}
+
+public class AnonumousInnerTest {
+
+	public static void main(String[] args) {
+		Outer2 out = new Outer2();
+		Runnable runner = out.getRunnable(100);
+		
+		runner.run();
+	}
+
+}
+```
+
+### 출력 결과
+```console
+i = 100
+num = 10
+localNum = 1000
+outNum = 100(외부 클래스 인스턴스 변수)
+Outer.sNum = 200(외부 클래스 정적 변수)
+```
+
+## 익명 내부 클래스
+- 이름이 없는 클래스 (위 지격 내부 클래스의 MyRunnable 클래스 이름은 실제로 호출되는 경우가 없습니다.)
+- 클래스의 이름을 생략하고 주로 하나의 인터페이스나 하나의 추상 클래스를 구현하여 반환합니다.
+- 인터페이스나 추상 클래스 자료형의 변수에 직접 대입하여 클래스를 생성하거나 지역 내부 클래스의 메서드 내부에서 생성하여 반환할 수 있습니다.
+- widget의 이벤트 핸들러에 활용됩니다.
+
+```java
+class Outer2 {
+	
+	int outNum = 100; // 멤버 변수는 생성자에서 하는게 좋은 방법이지만 예제이기 때문에 그냥 함.
+	static int sNum = 200;
+	
+	Runnable getRunnable(int i) { // i는 stack 메모리에 생성
+		int num = 10; // num은 stack 메모리에 생성
+		
+		return new Runnable() {
+			
+			int localNum = 1000;
+			
+			@Override
+			public void run() {
+				System.out.println("i = " + i);
+				System.out.println("num = " + num);
+				System.out.println("localNum = " + localNum);
+
+				System.out.println("outNum = " + outNum + "(외부 클래스 인스턴스 변수)");
+				System.out.println("Outer.sNum = " + Outer2.sNum + "(외부 클래스 정적 변수)");
+			}
+		};
+	}
+	
+	Runnable runnable = new Runnable() {
+
+		@Override
+		public void run() {
+			System.out.println("Runnable class");
+		}
+		
+	};
+}
+
+public class AnonumousInnerTest {
+
+	public static void main(String[] args) {
+		Outer2 out = new Outer2();
+		Runnable runner = out.getRunnable(100);
+		
+		runner.run();
+		
+		out.runnable.run();
+	}
+
+}
+```
+
+### 출력 결과
+```console
+i = 100
+num = 10
+localNum = 1000
+outNum = 100(외부 클래스 인스턴스 변수)
+Outer.sNum = 200(외부 클래스 정적 변수)
+Runnable class
+```
+
+# 람다식(Lambda expression)
+## 함수형 프로그래밍과 람다식
+- 자바는 객체 지향 프로그래밍 : 기능을 수행하긴 위해서는 객체를 만들고 그 객체 내부에 멤버 변수를 선언하고 기능을 수행하는 메서드를 구현합니다.
+- 자바 8부터 함수형 프로그래밍 방식을 지원하고 이를 람다식이라고 합니다.
+- 함수의 구현과 호출만으로 프로그래밍이 수행되는 방식입니다.
+- 함수형 프로그래밍(Functional Programming: FP)
+```textarea
+함수형 프로그래밍은 순수함수(pure function)를 구현하고 호출함으로써 외부 자료에 부수적인 영향(side effect)를 주지 않도록 구현하는 방식입니다.
+순수 함수란 매개변수만을 사용하여 만드는 함수입니다. 즉, 함수 내부에서 함수 외부에 있는 변수를 사용하지 않아 함수가 수행되더라도 외부에는 영향을 주지 않습니다.
+
+함수를 기반으로 하는 프로그래밍이고 입력받는 자료 이외에 외부 자료를  사용하지 않아 여러 자료가 동시에 수행되는 병렬 처리가 가능합니다.
+함수형 프로그래밍은 함수의 기능이 자료에 독립적임을 보장합니다. 이는 동일한 자료에 대해 동일한 결과를 보장하고, 다양한 자료에 대해 같은 기능을 수행할 수 있습니다.
+```
+
+## 람다식 문법
+- 익명 함수 만들기
+- 매개 변수와 매개변수를 이용한 실행문 (매개 변수) -> {실행문;}
+- 두 수를 입력 받아 더하는 add() 함수 예
+
+```java
+int add(int x, int y) {
+	return x + y;
+}
+```
+- 람다식으로 표현
+
+```java
+(int x, int y) -> {return x + y;}
+```
+
+- 매개 변수가 하나인 경우 자료형과 ()생략 가능합니다.
+
+```java
+str -> {System.out.println(str);}
+```
+
+- 매개변수가 두 개 이상인 경우 ()를 생략할 수 없습니다.
+
+```java
+x, y -> {System.out.println(x + y);} // 오류
+```
+
+- 실행문이 한 문장인 경우 중괄호 생략 가능합니다.
+
+```java
+str -> System.out.println(str);
+```
+
+- 실행문이 한 문장이라도 return문(반환문)은 중괄호를 생략할 수 없습니다.
+
+```java
+str -> return str.length(); // 오류
+```
+
+- 실행문이 한 문장의 반환문인 경우엔 return과 중괄호를 모두 생략합니다.
+
+```java
+(x, y) -> x + y;
+str -> str.length;
+```
+
+### 예제
+```java
+public interface Add {
+	public int add(int x, int y);
+	
+}
+```
+```java
+public class AddTest {
+
+	public static void main(String[] args) {
+		Add addL = (x, y) -> {return (x + y);};
+		
+		System.out.println(addL.add(2, 3));
+	}
+
+}
+```
+```console
+5
+```
+
+# 함수형 인터페이스와 람다식 구현하여 사용하기
+## 함수형 인터페이스 선언하기
+- 람다식을 선언하기 위한 인터페이스
+- 익명 함수와 매개 변수만으로 구현되므로 인터페이스는 단 하나의 메서드만을 선언해야합니다.
+- @FunctionalInterface 애노테이션(annotation)<br/>
+  함수형 인터페이스라는 의미, 내부에 여러 개의 메서드를 선언하며 에러납니다.
+	```java
+	@FunctionalInterface
+	public interface MyNumber { // Error
+		int getMax(int n1, int n2);
+		int add(int x, int y);
+	}
+	```
+	
+- 람다식 구현과 호출
+```java
+@FunctionalInterface
+public interface MyNumber {
+	int getMax(int n1, int n2);
+}
+```
+```java
+public class MyNumberTest {
+
+	public static void main(String[] args) {
+		MyNumber myNumber = (x, y) -> x > y? x : y;
+		
+		System.out.println(myNumber.getMax(10, 20));
+	}
+
+}
+```
+
