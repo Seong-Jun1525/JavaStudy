@@ -6250,3 +6250,418 @@ public class MyNumberTest {
 }
 ```
 
+# 스트림(Stream)
+## 스트림이란?
+- 자료의 대상과 관계없이 동일한 연산을 수행합니다.<br />
+  배열, 컬렉션을 대상으로 연산을 수행합니다.<br />
+  일관성 있는 연산으로 자료의 처리를 쉽고 간단하게 합니다.<br />
+  자료 처리에 대한 추상화가 구현되었다고 합니다.
+- 한번 생성하고 사용한 스트림은 재사용할 수 없습니다. <br />
+  자료에 대한 스트림을 생성하여 연산을 수행하면 스트림은 소모됩니다.<br />
+  다른 연산을 수행하기 위해서는 스트림을 다시 생성해야 합니다.
+- 스트림 연산은 기존 자료를 변경하지 않습니다.<br />
+  자료에 대한 스트림을 생성하면 스트림이 사용하는 메모리 공간은 별도로 생성되므로 연산이 수행되도 기존 자료에 대한 변경은 발생하지 않습니다.
+- 스트림 연산은 중간 연산과 최종 연산으로 구분 됩니다.<br />
+  스트림에 대해 중간 연산은 여러 개의 연산이 적용될 수 있지만 최종 연산은 마지막에 한 번만 적용됩니다.<br />
+  최종연산이 호출되어야 중간 연산에 대한 수행이 이루어 지고 그 결과가 만들어 집니다.<br />
+  따라서 중간 연산에 대한 결과를 연산 중에 알 수 없습니다.<br />
+  이를 '지연 연산'이라 합니다.
+
+## 스트림 생성하고 사용하기
+- 정수 배열에 스트림 생성하여 연산을 수행하는 예
+```java
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
+public class IntArrayStreamTest {
+
+	public static void main(String[] args) {
+		int[] arr = {1, 2, 3, 4, 5};
+		
+		for(int num : arr) {
+			System.out.println(num);
+		}
+		
+		System.out.println();
+		
+		IntStream is = Arrays.stream(arr);
+		
+		is.forEach(n -> System.out.println(n));
+		
+		System.out.println();
+		
+//		is. 코드 상 에러라고 뜨지는 않지만 출력했을 때 error가 생김. 왜냐면 한번 연산이 시행되고 나면 소모가 되기 떄문.
+		
+		int sum = Arrays.stream(arr).sum(); // 그렇기 때문에 또 다른 연산을 사용하기 위해서는 스트림을 다시 생성하여야 함.
+		System.out.println(sum);		
+	}
+
+}
+```
+
+## 중간 연산과 최종 연산
+- 중간 연산의 예 - filter(), map(), sorted() 등<br />
+  조건에 맞는 요소를 추출(filter)하거나 요소를 변환 합니다.(map)
+- 최종 연산이 호출될 때 중간 연산이 수행되고 결과가 생성 됩니다.
+
+
+문자열 리스트에서 문자열의 길이가 5 이상인 요소만 출력하기
+```java
+sList.stream().filter(s -> s.length() >= 5).forEach(s -> System.out.println(s));
+```
+fliter()는 중간 연산이고, forEach()는 최종 연산입니다.
+
+고객 클래스 배열에서 고객 이름만 가져오기
+```java
+customerList.stream().map(c -> c.getName()).forEach(s -> System.out.println(c));
+```
+map()은 중간 연산이고, forEach()는 최종 연산입니다.
+
+- 중간 연산과 최종 연산에 대한 구현은 람다식을 활용합니다.
+- 최종 연산의 예 - forEach(), count(), sum() 등 <br />
+  스트림이 관리하는 자료를 하나씩 소모해가며 연산이 수행됩니다.<br />
+  최종 연산 후에 스트림은 더 이상 다른 연산을 적용할 수 없습니다. <br />
+  forEach(): 요소를 하나씩 꺼내 옵니다. <br />
+  count(): 요소의 개수 <br />
+  sum(): 요소들의 합
+
+## ArrayList 객체에 스트림 생성하고 사용하기
+- ArrayList에 문자열 자료(이름)을 넣고 이에 대한 여러 연산을 수행해보기
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+public class ArrayListStreamTest {
+
+	public static void main(String[] args) {
+		List<String> sList = new ArrayList<String>();
+		
+		sList.add("Aaksdn");
+		sList.add("Caklsndl");
+		sList.add("Baj");
+		
+		Stream<String> stream = sList.stream();
+		stream.forEach(s -> System.out.println(s));
+		
+		System.out.println();
+		
+		sList.stream().sorted().forEach(s -> System.out.print(s + "\t"));
+		System.out.println();
+		sList.stream().map(s -> s.length()).forEach(n -> System.out.print(n + "\t"));
+		System.out.println();
+		sList.stream().filter(s -> s.length() >= 5).forEach(s -> System.out.print(s + "\t"));
+		
+	}
+
+}
+```
+
+- 새로운 연산을 수행하기 위해서는 기존의 스트림은 재사용할 수 없고 stream() 메서드를 호출하여 스트림을 다시 생성하여야 합니다.
+
+# 객체지향 프로그래밍 vs 람다식 구현
+## 객체지향 프로그래밍과 람다식 비교
+- 문자열 두 개를 연결하여 출력하는 예제를 두 가지 방식으로 구현
+- 인터페이스 선언
+```java
+public interface StringConcat {
+	public void makeString(String s1, String s2);
+}
+```
+
+- 객체지향 프로그래밍으로 구현
+
+### 인터페이스를 구현한 클래스 만들기
+```java
+public class StringConCatImpl implements StringConcat {
+	@Override
+	public void makeString(String s1, String s2) {
+		System.out.println(s1 + ", " + s2);
+	}
+}
+```
+
+### 클래스를 생성하고 메서드 호출하기
+```java
+public class StringConcatTest {
+
+	public static void main(String[] args) {
+		// 람다식 이전에 클래스를 사용하는 방식
+		String s1 = "Hello";
+		String s2 = "World";
+		StringConCatImpl strImpl = new StringConCatImpl();
+		strImpl.makeString(s1, s2);
+}
+```
+
+### 람다식으로 구현하기
+```java
+public class StringConcatTest {
+
+	public static void main(String[] args) {
+//	@FunctionalInterface을 StringConcat.java에 선언하고
+		String s1 = "Hello";
+		String s2 = "World";
+		
+		StringConCatImpl strImpl = new StringConCatImpl();
+		strImpl.makeString("Hello", "World");
+		
+		StringConcat concat = (s, v) -> System.out.println(s + ", " + v);
+		// 람다식을 이렇게 쓰게 되면 이게 아래 익명 클래스로 바뀐다 그렇기 때문에 메서드도 하나만 만들어야한다.
+		concat.makeString(s1, s2);
+		
+		StringConcat concat2 = new StringConcat() {
+			
+			@Override
+			public void makeString(String s1, String s2) {
+				System.out.println(s1 + "...." + s2);
+			}
+		};
+		
+		concat2.makeString(s1, s2);
+	}
+
+}
+```
+
+### 출력결과
+```console
+Hello, World
+Hello, World
+Hello....World
+```
+
+## 익명 객체를 생성하는 람다식
+- 자바에서는 객체없이 메서드가 호출될 수 없습니다.
+- 람다식을 구현하면 익명 내부 클래스가 만들어지고, 이를 통해 익명객체가 생성됩니다.
+
+```java
+StringConcat concat2 = new StringConcat() {
+			
+		@Override
+		public void makeString(String s1, String s2) {
+			System.out.println(s1 + "...." + s2);
+		}
+	};
+
+	concat2.makeString(s1, s2);
+}
+```
+- 익명 내부 클래스에서와 마찬가지로 람다식 내부에서도 외부에 있는 지역 변수의 값을 변경하면 오류가 발생합니다.
+
+## 함수를 변수처럼 사용하는 람다식
+```textarea
+변수는
+
+특정 자료형으로 변수를 선언한 후 값을 대입합니다.	int a = 10;
+
+매개 변수로 전달하여 사용합니다.	int add(int x, int y)
+
+메서드의 반환 값으로 반환 합니다.	return num;
+```
+
+- 인터페이스형 변수에 람다식 대입하기
+
+### 함수형 인터페이스
+```java
+interface PrintString {
+	void showString(String str);
+}
+```
+
+```java
+PrintString lamdaStr = s -> System.out.println(s); // 람다식을 변수에 대입
+lamdaStr.showString("hello lamda_1");
+```
+- 매개변수로 전달하는 람다식
+
+```java
+showMyString(lamdaStr);
+
+public static void showMyString(PrintString p) {
+	p.showString("hello lamda_2");
+}
+```
+
+- 반환 값으로 쓰이는 람다식
+
+```java
+public static PrintString returnString() { // 반환 값으로 사용
+	return s -> System.out.println(s + "world");
+}
+
+PrintString reStr = returnString();
+reStr.showString("hello ");
+```
+
+# 연산 수행에 대한 구현을 할 수 있는 reduce()연산
+## reduce() 연산
+- 정의된 연산이 아닌 프로그래머가 직접 구현한 연산을 적용합니다.
+
+```java
+T reduce(T identify, BinaryOperator<T> accumulator)
+```
+- 최종 연산으로 스트림의 요소를 소모하며 연산을 수행합니다.
+- 배열의 모든 요소의 합을 구하는 reduce() 연산 구현 예
+
+```java
+Arrays.stream(arr).reduce(0, (a, b) -> a + b);
+```
+- reduce() 메서드의 두 번째 요소로 전달되는 람다식에 따라 다양한 기능을 수행할 수 있습니다.
+- 람다식을 직접 구현하거나 람다식이 긴 경우 BinaryOperator를 구현한 클래스를 사용합니다.
+
+## BinaryOperator를 구현하여 배열에 여러 문자열이 있을 때 길이가 가장 긴 문자열 찾기 예
+```java
+import java.util.Arrays;
+import java.util.function.BinaryOperator;
+
+class CompareString implements BinaryOperator<String> {
+
+	@Override
+	public String apply(String s1, String s2) {
+		if(s1.getBytes().length >= s2.getBytes().length) return s1;
+		else return s2;
+	}
+	
+}
+
+public class ReduceTest {
+
+	public static void main(String[] args) {
+		String greetings[] = {"안녕하세요", "hello", "Good morning", "반갑습니다^^"};
+		
+		System.out.println(
+			Arrays.stream(greetings).reduce("", (s1, s2) -> {
+				if(s1.getBytes().length >= s2.getBytes().length) return s1;
+				else return s2;
+			}
+		));
+		
+		String str = Arrays.stream(greetings).reduce(new CompareString()).get();
+		System.out.println(str);
+	}
+
+}
+```
+
+### 출력결과
+```console
+Good morning
+Good morning
+```
+
+# 스트림을 활용하여 패키지 여행 비용 계산하기
+
+## 문제 정의
+```textarea
+여행사에 패키지 여행 상품이 있습니다. 여행 비용은 15세 이상은 100만원, 그 미만은 50만원 입니다.
+고객 세 명이 패키지 여행을 떠난다고 했을 때 비용 계산과 고객 명단 검색 등에 대한 연산을 스트림을 활용하여 구현해 봅니다.
+고객에 대한 클래스를 만들고 ArrayList로 고객을 관리 합니다.
+
+고객 정보는 다음과 같습니다.
+
+CustomerLee
+이름: 이순신
+나이: 40
+비용: 100
+
+CustomerKim
+이름: 김유신
+나이: 20
+비용: 50
+
+CustomerHong
+이름: 홍길동
+나이: 13
+비용: 50
+```
+
+## 고객 클래스
+```java
+public class TravelCustomer {
+	private String name; // 이름
+	private int age; // 나이
+	private int price; // 가격
+	
+	public TravelCustomer(String name, int age, int price) {
+		this.name = name;
+		this.age = age;
+		this.price = price;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	public int getPrice() {
+		return price;
+	}
+
+	public void setPrice(int price) {
+		this.price = price;
+	}
+}
+```
+
+### TravelCustomerTest.java
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class TravelCustomerTest {
+
+	public static void main(String[] args) {
+		TravelCustomer customerLee = new TravelCustomer("이순신", 40, 100);
+		TravelCustomer customerKim = new TravelCustomer("김유신", 20, 100);
+		TravelCustomer customerHong = new TravelCustomer("홍길동", 13, 50);
+		
+		List<TravelCustomer> customerList = new ArrayList<TravelCustomer>();
+		
+		customerList.add(customerLee);
+		customerList.add(customerKim);
+		customerList.add(customerHong);
+		
+		System.out.println("고객 명단 출력");
+		customerList.stream().map(c -> c.getName()).forEach(s -> System.out.println(s));
+		System.out.println();
+		
+		System.out.println("여행 비용 값");
+		System.out.println(customerList.stream().mapToInt(c -> c.getPrice()).sum());
+		System.out.println();
+		
+		System.out.println("20세 이상");
+		customerList.stream().filter(c -> c.getAge() >= 20).map(c -> c.getName()).sorted().forEach(s -> System.out.println(s));
+		System.out.println();
+		
+	}
+
+}
+```
+
+### 출력 결과
+```console
+고객 명단 출력
+이순신
+김유신
+홍길동
+
+여행 비용 값
+250
+
+20세 이상
+김유신
+이순신
+```
