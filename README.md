@@ -6717,10 +6717,96 @@ Class.forName("sis.studentinfo.Student"); // 클래스가 로드되지 않은 �
 ```
 - InterruptedException: Thread.sleep(), join().Object의 wait()로 non-runnable 상태인 thread를 Runnable하게 만들 수 있도록 사용할 수 있습니다.
 
+# 예외 처리하기와 미루기
+## try-catch문
+- try 블록에는 예외가 발생할 가능성이 있는 코드를 작성하고 try 블록 안에서 예외가 발생하는 경우 catch 블록이 수행됩니다.
 
+```java
+try {
+	// 예외가 발생할 수 있는 코드 부분
+} catch {
+	// try 블록 안에서 예외가 발생했을 때 예외를 처리하는 부분
+}
+```
 
+- 프로그래머가 예외를 처리해줘야 하는 예 (배열의 오류 처리)
 
+```java
+public class ArrayIndexException {
 
+	public static void main(String[] args) {
+		int[] arr = {1, 2, 3, 4, 5};
+		
+		try {
+			for(int i = 0; i <= 5; i++) {
+				System.out.println(arr[i]);
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			System.out.println(e.toString());
+		}
+	}
+
+}
+```
+
+### 출력 결과
+```console
+1
+2
+3
+4
+5
+Index 5 out of bounds for length 5
+java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 5
+```
+
+## try-catch-finally 문
+- finally 블록에서 파일을 닫거나 네트워크를 닫는 등의 리소스 해제 구현을 합니다.
+- try {} 블록이 수행되는 경우, finally {} 블록은 항상 수행됩니다.
+- 여러 개의 예외 블록이 있는 경우 각각에서 리소스를 해제하지 않고 finally 블록에서 해제하도록 구현합니다.
+- 컴파일러에 의해 예외가 처리되는 예 (파일 에러 처리)
+
+```java
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+public class FileExceptionHandling {
+
+	public static void main(String[] args) {
+		FileInputStream fis = null;
+		
+		try {
+			fis = new FileInputStream("a.txt");
+			System.out.println("read");
+		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+			System.out.println(e);
+			return;
+		} finally {
+			if(fis != null) {
+				try {
+					fis.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			System.out.println("finally");
+		}
+		
+		System.out.println("end");
+	}
+
+}
+```
+```console
+java.io.FileNotFoundException: a.txt (지정된 파일을 찾을 수 없습니다)
+finally
+```
+
+## try
 
 
 
