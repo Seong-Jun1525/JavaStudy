@@ -6849,9 +6849,300 @@ public class AutoCloseTest {
 End
 ```
 
+## 예외 처리 미루기
+- 예외 처리는 예외가 발생하는 문장에서 try-catch 블록으로 처리하는 방법과 이를 사용하는 부분에서 처리하는 방법 두 가지가 있습니다.
+- throws를 이용하면 예외가 발생할 수 있는 부분을 사용하는 문장에서 예외를 처리할 수 있습니다.
 
+```java
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
+public class ThrowsException {
 
+	public Class loadClass(String fileName, String className) throws ClassNotFoundException, FileNotFoundException {
+		// throws는 미루겠다는 의미
+		// 이 Exception들은 여기서 발생할 수 있지만 여기서 핸들링 하지 않겠다는 의미
+		// loadClass를 쓰는 쪽에서 핸들리을 한다
+		FileInputStream fis = new FileInputStream(fileName);
+		
+		Class c = Class.forName(className);
+		return c;
+	}
+	
+	public static void main(String[] args) {
+		ThrowsException test = new ThrowsException();
+		
+		try {
+			test.loadClass("a.txt", "java.lang.String");
+		} catch (ClassNotFoundException e) {
+			System.out.println(e);
+		} catch (FileNotFoundException e) {
+			System.out.println(e);
+		}
+		
+		System.out.println("END");
+		
+	}
+
+}
+```
+
+## 하나의 try{} 블록에서 예외가 여러 개 발생하는 경우
+- 여러 개의 예외가 발생하는 경우 예외를 묶어서 하나의 방법으로 처리할 수도 있고,
+```java
+try {
+	test.loadClass("a.txt", "java.lang.String");
+} catch (FileNotFoundException | ClassNotFoundException e) {
+	System.out.println(e);
+}
+```
+- 각각의 예외를 따로 처리할 수도 있습니다.
+
+```java
+		try {
+			test.loadClass("a.txt", "java.lang.String");
+		} catch (ClassNotFoundException e) {
+			System.out.println(e);
+		} catch (FileNotFoundException e) {
+			System.out.println(e);
+		} catch (Exception e) {
+//			또 다른 Exception이 발생할 수 있는데 그것이 무엇인지는 모를 때
+//			그거에 대해 디폴트로 핸들링 하고 싶을때 default로 핸들링을 하고싶으면
+//			최상위 Exception을 넣음 
+//			중요한 것은 Default Exception을 맨 위에 작성하면 Error
+		}
+```
+- Exception 클래스를 활용하여 default를 처리를 할 때 Exception 블록은 맨 마지막에 위치해야 합니다.
+
+# 사용자 정의 예외 클래스와 그 활용
+## 사용자 정의 예외 클래스 구현하기
+- 자바에서 제공되는 예외 클래스외에 프로그래머가 직접 만들어야 하는 예외가 있을 수 있습니다.
+- 기존 예외 클래스 중 가장 유사한 예외 클래스에서 상속 받아 사용자 정의 예외 클래스를 만듭니다.
+- 기본적으로 Exception 클래스를 상속해서 만들 수 있습니다.
+
+## 패스워드에 대한 예외 처리하기
+- 패스워드를 입력할 때 다음과 같은 경우 오류처리를 합니다.
+
+```textarea
+비밀번호는 null일 수 없습니다.
+
+비밀번호의 길이는 5이상입니다.
+
+비밀번호는 문자로만 이루어져서는 안됩니다. (하나 이상의 숫자나 특수문자를 포함합니다.)
+```
+
+```java
+public class PasswordException extends Exception {
+	public PasswordException(String message) {
+		super(message);
+	}
+}
+```
+```java
+public class PasswordTest {
+	private String password;
+	
+	public String getPassword() {
+		return password;
+	}
+	
+	public void setPassword(String password) throws PasswordException {
+		if (password == null) {
+			throw new PasswordException("비밀번호는 null일 수 없습니다.");
+		}
+		else if (password.length() < 5) {
+			throw new PasswordException("비밀번호는 5자리 이상이어야 합니다.");
+		}
+		else if (password.matches("[a-zA-Z]+")) {
+			throw new PasswordException("비밀번호는 숫자나 특수문자를 포함해야 합니다.");
+		}
+		this.password = password;
+	}
+	
+	public static void main(String[] args) {
+		PasswordTest test = new PasswordTest();
+		String password = null;
+		
+		try {
+			test.setPassword(password);
+			System.out.println("오류없음 1");
+		} catch (PasswordException e) {
+			System.out.println(e.getMessage());
+		}
+		
+		password = "abcd";
+		
+		try {
+			test.setPassword(password);
+			System.out.println("오류없음 2");
+		} catch (PasswordException e) {
+			System.out.println(e.getMessage());
+		}
+		
+		password = "abcde";
+		
+		try {
+			test.setPassword(password);
+			System.out.println("오류없음 3");
+		} catch (PasswordException e) {
+			System.out.println(e.getMessage());
+		}
+		
+		password = "abcd#1";
+		
+		try {
+			test.setPassword(password);
+			System.out.println("오류없음 4");
+		} catch (PasswordException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+}
+```
+
+### 출력결과
+```console
+비밀번호는 null일 수 없습니다.
+비밀번호는 5자리 이상이어야 합니다.
+비밀번호는 숫자나 특수문자를 포함해야 합니다.
+오류없음 4
+```
+
+# 오류의 로그를 남기기 - java.util.logging.Logger 활용
+## logging
+- 시스템 운영에 대한 기록
+- 오류가 발생했을 때 그 오류에 대한 기록을 남겨 디버깅을 용이하게 합니다.
+- 로그 파일에 기록하는 코드를 추가하여 필요한 정보가 로그로 남을 수 있도록 합니다.
+- 디버깅, 시스템 에러 추적, 성능, 문제점 향상들을 위해 사용합니다.
+- 어느정도까지 로그를 남길 것인가요?
+	- 너무 적은 로그 : 정확한 시스템의 상황을 파악하기 어렵습니다.
+	- 너무 많은 로그 : 빈번한 I/O의 오버헤드와 로그 파일의 백업 문제 등...
+
+## java.util.logging
+- 자바에서 기본적으로 제공되는 log 패키지
+- 파일이나 콘솔에 로그 내용을 출력할 수 있습니다.
+- jre/lib/logging.properties 파일을 편집하여 로그의 출력방식 로그 레벨을 변경할 수 있습니다.
+- logging 패키지에서 제공하는 로그 레벨은 severe, warning, info, config, fine, finer, finest 입니다.
+- 오픈 소스로는 log4j를 많이 사용하고 있습니다.
+
+### Handler
+- 화면에 출력해주는 console 핸들러
+- 파일 핸들러
+
+## Logger 만들기
+- 시나리오
+
+```textarea
+학생 정보 시스템에 로그를 기록하도록 합니다.
+
+학생의 이름에 오류가 있는 경우 예외 처리를 하고 예외 상황을 로그로 남깁니다.
+
+학생의 이름은 null이거나 중간에 space가 3개 이상인 경우 오류가 발생합니다.
+```
+- 구현하기
+
+```java
+Logger 인스턴스를 생성합니다.
+
+로그를 남기기 위한 FIleHandler를 생성합니다.
+
+FileHandler의 level을 지정하고
+
+Logger에 생성된 addHandler()메서드로 FileHandler를 추가합니다.
+```
+
+### MyLooger.java
+```java
+import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+
+public class MyLogger {
+	Logger logger = Logger.getLogger("mylogger");
+	private static MyLogger instance = new MyLogger();
+	
+	public static final String errorLog = "log.txt";
+	public static final String warningLog = "warning.txt";
+	public static final String fineLog = "fine.txt";
+	
+	private FileHandler logFile = null;
+	private FileHandler warningFile = null;
+	private FileHandler fineFile = null;
+	
+	private MyLogger() {
+		try {
+			logFile = new FileHandler(errorLog, true);
+			warningFile = new FileHandler(warningLog, true);
+			fineFile = new FileHandler(fineLog, true);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		logFile.setFormatter(new SimpleFormatter());
+		warningFile.setFormatter(new SimpleFormatter());
+		fineFile.setFormatter(new SimpleFormatter());
+		
+		logFile.setLevel(Level.ALL);
+		warningFile.setLevel(Level.FINE);
+		fineFile.setLevel(Level.WARNING);
+		
+		logger.addHandler(logFile);
+		logger.addHandler(warningFile);
+		logger.addHandler(fineFile);
+	}
+	
+	public static MyLogger getLogger() {
+		return instance;
+	}
+	
+	public void log(String msg){
+		
+		logger.finest(msg);
+		logger.finer(msg);
+		logger.fine(msg);
+		logger.config(msg);
+		logger.info(msg);
+		logger.warning(msg);
+		logger.severe(msg);
+		
+	}
+	
+	public void fine(String msg){
+		logger.fine(msg);
+	}
+	
+	public void warning(String msg){
+		logger.warning(msg);
+	}
+}
+```
+
+### LoggerTest.java
+```java
+public class LoggerTest {
+
+	public static void main(String[] args) {
+		MyLogger myLogger = MyLogger.getLogger();
+		
+		myLogger.log("test");
+	}
+
+}
+```
+
+### 출력 결과
+```console
+12월 13, 2021 6:25:14 오후 ch59.MyLogger log
+INFO: test
+12월 13, 2021 6:25:14 오후 ch59.MyLogger log
+WARNING: test
+12월 13, 2021 6:25:14 오후 ch59.MyLogger log
+SEVERE: test
+```
 
 
 
