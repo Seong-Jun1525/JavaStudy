@@ -7301,3 +7301,116 @@ WARNING: 이름이 너무 길어요
 -- | --
 기반 스트림 | FileInputStream, FileOutputStream, FileReader, FileWriter 등
 보조 스트림 | InputStreamReader(읽은 거를 문자로 변환해주는 Stream), OutputStreamWriter, BufferedInputStream, BufferedOutputStream 등
+
+# 표준 입출력 스트림
+## System 클래스의 표준 입출력 멤버
+```java
+public class System {
+	public static PrintStream out;
+	public static InputStream in;
+	public static PrintStream err;
+}
+```
+
+### System.out
+표준 출력(모니터) 스트림 <br />
+System.out.println("출력 메세지");
+
+### System.in
+표준 입력(키보드) 스트림 <br />
+int d = System.in.read(); // 한 바이트 읽기
+
+### System.err
+표준 에러 출력(모니터) 스트림 <br />
+System.err.println("에러 메세지");
+
+```java
+import java.io.IOException;
+
+public class SystemInTest11 {
+
+	public static void main(String[] args) {
+		System.out.println("알파벳 여러 개를 쓰고 [Enter]를 누르세요");
+		int i;
+		try {
+			while((i = System.in.read()) != '\n') {
+//				System.out.println(i);
+				System.out.print((char)i);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+}
+```
+### 출력결과
+```console
+알파벳 여러 개를 쓰고 [Enter]를 누르세요
+ansjdnasld
+ansjdnasld
+```
+
+- 위의 코드는 한글은 깨집니다.
+- 아래와 같이 수정해줍니다.
+
+```java
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public class SystemInTest11 {
+
+	public static void main(String[] args) {
+		System.out.println("알파벳 여러 개를 쓰고 [Enter]를 누르세요");
+		int i;
+		try {
+			InputStreamReader irs = new InputStreamReader(System.in);
+			while((i = irs.read()) != '\n') {
+//				System.out.println(i);
+				System.out.print((char)i);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+}
+```
+
+### 출력결과
+```console
+알파벳 여러 개를 쓰고 [Enter]를 누르세요
+안녕하세요
+안녕하세요
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
