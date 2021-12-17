@@ -1,0 +1,6 @@
+12월 17, 2021 2:40:17 오후 ch59.MyLogger warning
+WARNING: name must not be null
+12월 17, 2021 2:40:17 오후 ch59.MyLogger warning
+WARNING: 이름이 너무 길어요
+12월 17, 2021 2:40:17 오후 ch59.MyLogger fine
+FINE: begin getStudentName()
