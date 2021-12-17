@@ -7086,9 +7086,9 @@ public class MyLogger {
 		warningFile.setFormatter(new SimpleFormatter());
 		fineFile.setFormatter(new SimpleFormatter());
 		
-		logFile.setLevel(Level.ALL);
-		warningFile.setLevel(Level.FINE);
-		fineFile.setLevel(Level.WARNING);
+		logger.setLevel(Level.ALL);
+		fineFile.setLevel(Level.FINE);
+		warningFile.setLevel(Level.WARNING);
 		
 		logger.addHandler(logFile);
 		logger.addHandler(warningFile);
@@ -7100,7 +7100,6 @@ public class MyLogger {
 	}
 	
 	public void log(String msg){
-		
 		logger.finest(msg);
 		logger.finer(msg);
 		logger.fine(msg);
@@ -7136,33 +7135,169 @@ public class LoggerTest {
 
 ### 출력 결과
 ```console
-12월 13, 2021 6:25:14 오후 ch59.MyLogger log
+12월 17, 2021 2:38:33 오후 ch59.MyLogger log
 INFO: test
-12월 13, 2021 6:25:14 오후 ch59.MyLogger log
+12월 17, 2021 2:38:33 오후 ch59.MyLogger log
 WARNING: test
-12월 13, 2021 6:25:14 오후 ch59.MyLogger log
+12월 17, 2021 2:38:33 오후 ch59.MyLogger log
 SEVERE: test
 ```
 
+### Student.java
+```java
+public class Student {
+	private String studentName;
+	MyLogger myLogger = MyLogger.getLogger();
+	
+	public Student(String studentName){
 
+		if(studentName == null){
+			throw new StudentNameFormatException("name must not be null");
+		}
+		if( studentName.split(" ").length > 3) {
+			throw new StudentNameFormatException("이름이 너무 길어요");
+		}
+		
+		this.studentName = studentName;
+	}
 
+	
+	public String getStudentName() {
+		
+		myLogger.fine("begin getStudentName()");
+		
+		return studentName;
+	}
+}
+```
 
+### StudentNameFormatException.java
+```java
+public class StudentNameFormatException extends IllegalArgumentException {
+	public StudentNameFormatException(String message){
+		super(message);
+	}
+}
+```
 
+### StudentTest.java
+```java
+public class StudentTest {
 
+	public static void main(String[] args) {
+		MyLogger myLogger = MyLogger.getLogger();
+		
+		String name = null;
+		try{
+			Student student = new Student(name);
+		} catch( StudentNameFormatException e ){
+			myLogger.warning(e.getMessage());
+		}
+		
+		try{
+			Student student = new Student("Edward Jon Kim Test");
+		} catch ( StudentNameFormatException e){
+			myLogger.warning(e.getMessage());
+		}
+		
+		Student student = new Student("James");
+		
+		String sName = student.getStudentName();
+	}
 
+}
+```
 
+### 출력결과
+```console
+12월 17, 2021 2:40:17 오후 ch59.MyLogger warning
+WARNING: name must not be null
+12월 17, 2021 2:40:17 오후 ch59.MyLogger warning
+WARNING: 이름이 너무 길어요
+```
 
+### fine.txt
+```textarea
+12월 17, 2021 2:40:17 오후 ch59.MyLogger warning
+WARNING: name must not be null
+12월 17, 2021 2:40:17 오후 ch59.MyLogger warning
+WARNING: 이름이 너무 길어요
+12월 17, 2021 2:40:17 오후 ch59.MyLogger fine
+FINE: begin getStudentName()
+```
 
+### log.txt
+```textarea
+12월 17, 2021 2:40:17 오후 ch59.MyLogger warning
+WARNING: name must not be null
+12월 17, 2021 2:40:17 오후 ch59.MyLogger warning
+WARNING: 이름이 너무 길어요
+12월 17, 2021 2:40:17 오후 ch59.MyLogger fine
+FINE: begin getStudentName()
+```
 
+### warning.txt
+```textarea
+12월 17, 2021 2:40:17 오후 ch59.MyLogger warning
+WARNING: name must not be null
+12월 17, 2021 2:40:17 오후 ch59.MyLogger warning
+WARNING: 이름이 너무 길어요
+```
 
+- Exception 상황에서는 반드시 log를 남겨야합니다.
+- 그 log를 레벨별로 잘 알 수 있도록 해야합니다.
 
+# 자바의 입출력을 위한 I/O Stream
+## 입출력 스트림
+- 네트워크에서 자료의 흐름이 물의 흐름과 같다는 비유에서 유래됩니다.
+- 자바는 다양한 입출력 장치에 독립적으로 일관성있는 입출력을 입출력 스트림을 통해 제공합니다.
+- 입출력이 구현되는 곳: 파일 디스크, 키보드, 마우스, 네트워크, 메모리 등 모든 자료가 입력되고 출력되는 곳
 
+## 입출력 스트림의 구분
+- 대상 기준 : 입력 스트림 / 출력 스트림
+	- 자료가 들어가는 길이랑 나오는 길은 따로있습니다.
+	- 즉, 입출력을 같이 사용할 수 없습니다.
+- 자료의 종류 : 바이트 스트림 / 문자 스트림 
+	- 원래 자료는 바이트 단위입니다.
+	- 문자를 워낙 많이 사용해서 문자용 스트림이 따로 있습니다. 이때 인코딩이 중요합니다.
+- 기능 : 기반 스트림 / 보조 스트림
 
+## 입력 스트림과 출력 스트림
+- 입력 스트림 : 대상으로부터 자료를 읽어 들이는 스트림
+- 출력 스트림 : 대상으로 자료를 출력하는 스트림
 
+![img24](./src/img/img24.png)
 
+- 스트림의 종류
 
+종류 | 예시
+-- | --
+입력 스트림 | FileInputStream(이걸로 읽으면 한글이 깨집니다.), FileReader(문자단위로 읽고 한글처리가 잘됩니다.), BufferedInputStream, BufferedReader 등
+출력 스트림 | FileOutputStream, FileWriter, BufferedOutputStream, BufferedWriter 등
 
+## 바이트 단위 스트림과 문자 단위 스트림
+- 바이트 단위 스트림 : 동영상, 음악 파일, 실행 파일 등의 자료를 읽고 쓸 때 사용합니다.
+- 문자 단위 스트림 : 바이트 단위로 자료를 처리하면 문자는 깨집니다. 인코딩에 맞게 2바이트 이상으로 처리하도록 구현된 스트림입니다.
 
+![img23](./src/img/img23.png)
 
+- 스트림의 종류
 
+종류 | 예시
+-- | --
+바이트 스트림 | FileInputStream, FileOutputStream, BufferedInputStream, BufferedOutputStream 등
+문자 스트림 | FileReader, FileWriter, BufferedReader, BufferedWriter 등
 
+## 기반 스트림과 보조 스트림
+- 기반 스트림 : 대상에 직접 자료를 읽고 쓰는 기능의 스트림
+- 보조 스트림 : 직접 읽고 쓰는 기능은 없이 추가적인 기능을 더해주는 스트림
+- 보조 스트림은 직접 읽고 쓰는 기능은 없으므로 항상 기반 스트림이나 또 다른 보조 스트림을 생성자의 매개 변수로 포함합니다.
+
+**기반스트림 + 보조 스트림A + 보조스트림B**
+
+- 스트림의 종류
+
+종류 | 예시
+-- | --
+기반 스트림 | FileInputStream, FileOutputStream, FileReader, FileWriter 등
+보조 스트림 | InputStreamReader(읽은 거를 문자로 변환해주는 Stream), OutputStreamWriter, BufferedInputStream, BufferedOutputStream 등
