@@ -7762,8 +7762,8 @@ public class FileWriterTest {
 # 여러가지 보조 스트림 클래스들
 ## 보조 스트림
 - 실제 읽고 쓰는 스트림이 아닌 보조 기능을 제공하는 스트림
-- FilterInputStream과 FilterOutputStream이 보조 스트림의 상위 클래스들
-- 생성자의 매개변수로 또 다른 스트림(기반 스트림이나 다른 보조 스트림)을 가집니다.
+- FilterInputStream과 FilterOutputStream이 보조 스트림의 상위 클래스들 (FilterInputStream과 FilterOutputStream은 추상 클래스)
+- 혼자 돌아갈 수 없기 때문에 생성자의 매개변수로 또 다른 스트림(기반 스트림이나 다른 보조 스트림)을 가집니다.
 - Decorator Pattern으로 구현됩니다.
 - 상위 클래스 생성자
 
@@ -7779,8 +7779,395 @@ public FilterOutputStream(OutputStream out) | 생성자의 매개변수로 Outpu
 - FileInputStream으로 읽은 자료를 문자로 변환해주는 예
 
 ```java
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
+public class InputStreamReaderTest {
+
+	public static void main(String[] args) {
+		try(InputStreamReader isr = new InputStreamReader(new FileInputStream("reader.txt"))) {
+			int i;
+			
+			while ((i = isr.read()) != -1) {
+				System.out.print((char)i);
+				
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
 ```
+
+## BufferedInputStream과 BufferedOutputStream
+- 약 8k의 배열이 제공되어 입출력이 빠르게 하는 기능이 제공되는 보조 스트림
+- BufferedReader와 BufferedWriter는 문자용 입출력 보조 스트림
+- BufferedInputStream과 BufferedOutputStream을 이용하여 파일 복사하는 예
+```java
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class FileCopyTest {
+
+	public static void main(String[] args) {
+
+		long millisecond = 0;
+		try (FileInputStream fis = new FileInputStream("a.zip");
+				FileOutputStream fos = new FileOutputStream("copy.zip")){
+		
+			millisecond = System.currentTimeMillis();
+			
+			int i;
+			while( ( i = fis.read()) != -1){
+				fos.write(i);
+			}
+			
+			millisecond = System.currentTimeMillis() - millisecond;
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("파일 복사 하는 데 " + millisecond + " milliseconds 소요되었습니다.");
+	}
+}
+```
+
+```java
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class BufferedStreamTest {
+
+	public static void main(String[] args) {
+		long millsecond = 0;
+		
+//		FileInputStream, FileOutputStream으로 하면 한 바이트씩 읽으니깐 굉장히 오래 걸림
+//		그래서 BufferedInputStream, BufferedOutputStream으로 묶어 준다
+//		134803 소요 -> 379 소요로 많이 줄어듬
+		
+		try(BufferedInputStream bis = new BufferedInputStream(new FileInputStream("a.zip"));
+				BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("copy.zip"))) {
+			
+			millsecond = System.currentTimeMillis();
+			
+			int i;
+			while((i = bis.read()) != -1) {
+				bos.write(i);
+			}
+			
+			millsecond = System.currentTimeMillis() - millsecond;
+			
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println(millsecond + " 소요되었습니다.");
+		
+		Socket socket = new Socket();
+		
+		BufferedReader br;
+		try {
+			br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			br.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// inputStream이든 ouputStream이든 byte단위로만 처리되기때문에 영어로만 작성해야함.
+		// 그래서 InputStreamReader로 감싸줌. 그럼 한글도 가능
+		// 근데 속도가 느리기때문에 속도를 향상시키기 위해 BufferedReader로 감싸준다
+	}
+
+}
+```
+
+## DataInputStream과 DataOutputStream
+- 자료가 메모리에 저장된 상태 그대로 읽거나 쓰는 스트림
+- DataInputStream 메서드
+
+메서드 | 설명
+-- | --
+byte readByte() | 1바이트를 읽어 반환합니다.
+boolean readBoolean() | 읽은 자료가 0이 아니면 true, 0이면 false를 반환합니다.
+char readChar() | 한 문자를 읽어 반환합니다.
+short readShort() | 2바이트를 읽어 정수 값을 반환합니다.
+int readInt() | 4바이트를 읽어 정수 값을 반환합니다.
+long readLong() | 8바이트를 읽어 정수 값을 반환합니다.
+float readFloat() | 4바이트를 읽어 실수 값을 반환합니다.
+double readDouble() | 8바이트를 읽어 실수 값을 반환합니다.
+String readUTF() | 수정된 UTF-8 인코딩 기반으로 문자열을 읽어 반환합니다.
+
+- DataOutputStream 메서드
+
+메서드 | 설명
+-- | --
+void writeByte(int v) | 1바이트의 자료를 출력합니다.
+void writeBoolean(boolean v) | 1바이트 값을 출력합니다.
+void writeChar(int v) | 2바이트를 출력합니다.
+void writeShort(int v) | 2바이트를 출력합니다.
+void writeInt(int v) | 4바이트를 출력합니다.
+void writeLong(long v) | 8바이트를 출력합니다.
+void writeFloat(float v) | 4바이트를 출력합니다.
+void writeDouble(double v) | 8바이트를 출력합니다.
+void writeUTF(String v) | 수정된 UTF-8 인코딩 기반으로 문자열을 출력합니다.
+
+
+```java
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class DataStreamTest {
+
+	public static void main(String[] args) {
+
+
+		try(FileOutputStream fos = new FileOutputStream("data.txt");
+				DataOutputStream dos = new DataOutputStream(fos)) {
+
+			dos.writeByte(100);
+			dos.writeChar('A');
+			dos.writeInt(10);
+			dos.writeFloat(3.14f);
+			dos.writeUTF("Test");
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+
+		try(FileInputStream fis = new FileInputStream("data.txt");
+				DataInputStream dis = new DataInputStream(fis)) {
+
+			System.out.println(dis.readByte());
+			System.out.println(dis.readChar());
+			System.out.println(dis.readInt());
+			System.out.println(dis.readFloat());
+			System.out.println(dis.readUTF());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+}
+```
+### 출력 결과
+```console
+100
+A
+10
+3.14
+Test
+```
+
+# 직렬화(Serialization)
+## 직렬화란?
+- 인스턴스의 상태를 그대로 파일에 저장하거나 네트워크로 전송하고(직렬화) 이를 다시 복원(Deserializtion)하는 방식입니다.
+- 자바에서는 보조 스트림을 활용하여 제공합니다.
+- ObjectInputStream과 ObjectOutputStream
+
+생성자 | 설명
+-- | --
+ObjectInputStream(InputStream in) | InputStream을 생성자의 매개변수로 받아 ObjectInputStream을 생성합니다.
+ObjectOutputStream(OutputStream out) | OutputStream을 생성자의 매개변수로 받아 ObjectOutputStream을 생성합니다.
+
+
+## Serializable 인터페이스
+- 직렬화는 인스턴스의 내용이 외부로 유출되는 것이므로 프로그래머가 해당 객체에 대한 직렬화 의도를 표시해야 합니다.
+- 구현 코드가 없는 market interface
+- transient : 직렬화 하지 않으려는 멤버 변수에 사용합니다. (Socket등 직렬화 할 수 없는 객체)
+
+```java
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+class Person implements Serializable { // Serializable는 구현코드 x. 이 객체가 직렬화 가능하다라는 것을 명시. 마크 인터페이스라고도 함.
+	String name;
+	transient String job;
+//	직렬화가 안되는 멤버를 가지고 있을 경우 해당 멤버 앞에 transient를 작성
+//	그럴 경우 복원할 때 넣어 주는 값은 디폴트 값이다
+
+	public Person() {}
+	
+	public Person(String name, String job) {
+		this.name = name;
+		this.job = job;
+	}
+	
+	public String toString() {
+		return name + ", " + job;
+	}
+	
+}
+
+public class SerializationTest {
+
+	public static void main(String[] args) {
+		Person personLee = new Person("이순신", "대장");
+		Person personLim = new Person("Lim", "왕");
+		
+		try(FileOutputStream fos = new FileOutputStream("serial.txt");
+				ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+			// writeObject를 할 때 Serializable 인터페이스가 명시되어 있지 않으면 error가 생기기 때문에 꼭 Serializable를 명시해줘야 한다
+			oos.writeObject(personLee);
+			oos.writeObject(personLim);
+		} catch(IOException e) {
+			System.out.println(e);
+		}
+		
+		try(FileInputStream fos = new FileInputStream("serial.txt");
+				ObjectInputStream ois = new ObjectInputStream(fos)) {
+			Person pLee = (Person)ois.readObject();
+			Person pLim = (Person)ois.readObject();
+			
+			System.out.println(pLee);
+			System.out.println(pLim);
+		} catch(IOException e) {
+			System.out.println(e);
+		} catch(ClassNotFoundException e) {
+			System.out.println(e);
+		}
+	}
+
+}
+```
+
+### 출력 결과
+```console
+이순신, 대장
+Lim, 왕
+```
+
+### 출력 결과 (transient를 작성했을 때)
+```console
+이순신, null
+Lim, null
+```
+
+## Externalizable 인터페이스
+- writerExternal()과 readExternal()메서드를 구현해야 합니다.
+- 프로그래머가 직접 객체를 읽고 쓰는 코드를 구현할 수 있습니다.
+
+```java
+import java.io.Externalizable;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+
+class Person implements Externalizable { // Serializable는 구현코드 x. 이 객체가 직렬화 가능하다라는 것을 명시. 마크 인터페이스라고도 함.
+	String name;
+	String job;
+//	transient String job;
+//	직렬화가 안되는 멤버를 가지고 있을 경우 해당 멤버 앞에 transient를 작성
+//	그럴 경우 복원할 때 넣어 주는 값은 디폴트 값이다
+	
+	public Person() {}
+	
+	public Person(String name, String job) {
+		this.name = name;
+		this.job = job;
+	}
+	
+	public String toString() {
+		return name + ", " + job;
+	}
+
+	
+	// 직렬화를 어떻게 할 것인지 직접 구현
+	@Override
+	public void writeExternal(ObjectOutput obj) throws IOException {
+		obj.writeUTF(name);
+		obj.writeUTF(job);
+	}
+
+	@Override
+	public void readExternal(ObjectInput obj) throws IOException, ClassNotFoundException {
+		name = obj.readUTF();
+		job = obj.readUTF();
+		
+	}
+	
+}
+
+public class SerializationTest {
+
+	public static void main(String[] args) {
+		Person personLee = new Person("이순신", "대장");
+		Person personLim = new Person("Lim", "왕");
+		
+		try(FileOutputStream fos = new FileOutputStream("serial.txt");
+				ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+			// writeObject를 할 때 Serializable 인터페이스가 명시되어 있지 않으면 error가 생기기 때문에 꼭 Serializable를 명시해줘야 한다
+			oos.writeObject(personLee);
+			oos.writeObject(personLim);
+		} catch(IOException e) {
+			System.out.println(e);
+		}
+		
+		try(FileInputStream fos = new FileInputStream("serial.txt");
+				ObjectInputStream ois = new ObjectInputStream(fos)) {
+			Person pLee = (Person)ois.readObject();
+			Person pLim = (Person)ois.readObject();
+			
+			System.out.println(pLee);
+			System.out.println(pLim);
+		} catch(IOException e) {
+			System.out.println(e);
+		} catch(ClassNotFoundException e) {
+			System.out.println(e);
+		}
+	}
+
+}
+```
+
+### 출력 결과
+```console
+이순신, 대장
+Lim, 왕
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
