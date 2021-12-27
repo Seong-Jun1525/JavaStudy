@@ -8513,13 +8513,278 @@ Thread[main,5,main]end
 
 ![img26](./src/img/img26.png)
 
+# Thread 클래스의 여러 메서드들
+## Thread 우선순위
+- Thread.MIN_PRIORITY(=1) ~ Thread.MAX_PRIORITY(=10)
+- 디폴트 우선순위 : Thread.NORMAL_PRIORITY(=5)
+- 우선순위가 높은 Thread가 CPU의 배분을 받을 확률이 높습니다.(확률이 높은거지 반드시 먼저 수행되는 것은 아닙니다.)
+- setPriority()/getPriority()
+- Thread 우선순위 예제
+
+```java
+class PriorityThread extends Thread{
+	
+	public void run(){
+	
+		int sum = 0;
+		
+		Thread t = Thread.currentThread();
+		System.out.println( t + "start");
+		
+		for(int i =0; i<=1000000; i++){
+			
+			sum += i;
+		}
+		
+		System.out.println( t.getPriority() + "end");
+	}
+}
 
 
+public class PriorityTest {
+
+	public static void main(String[] args) {
+
+		int i;
+		for(i=Thread.MIN_PRIORITY; i<= Thread.MAX_PRIORITY; i++){
+			
+			PriorityThread pt = new PriorityThread();
+			pt.setPriority(i);
+			pt.start();
+		
+		}
+	}
+
+}
+```
+
+### 출력 결과(결과는 계속 다릅니다.)
+```console
+Thread[Thread-1,2,main]start
+Thread[Thread-2,3,main]start
+Thread[Thread-3,4,main]start
+Thread[Thread-4,5,main]start
+Thread[Thread-5,6,main]start
+Thread[Thread-9,10,main]start
+Thread[Thread-8,9,main]start
+Thread[Thread-7,8,main]start
+Thread[Thread-6,7,main]start
+10end
+9end
+8end
+7end
+5end
+6end
+4end
+2end
+3end
+Thread[Thread-0,1,main]start
+1end
+```
+
+```java
+class PriorityThread extends Thread{
+	
+	public void run(){
+	
+		int sum = 0;
+		
+		Thread t = Thread.currentThread();
+		System.out.println( t + "start");
+		
+		for(int i =0; i<=1000000; i++){
+			
+			sum += i;
+		}
+		
+		System.out.println( t.getPriority() + "end");
+	}
+}
 
 
+public class PriorityTest {
 
+	public static void main(String[] args) {
 
+		PriorityThread pt1 = new PriorityThread();
+		PriorityThread pt2 = new PriorityThread();
+		PriorityThread pt3 = new PriorityThread();
+		
+		pt1.setPriority(Thread.MIN_PRIORITY);
+		pt2.setPriority(Thread.NORM_PRIORITY);
+		pt3.setPriority(Thread.MAX_PRIORITY);
+		
+		pt1.start();
+		pt2.start();
+		pt3.start();
+	}
 
+}
+```
+
+### 출력 결과
+```console
+Thread[Thread-2,10,main]start
+Thread[Thread-1,5,main]start
+10end
+5end
+Thread[Thread-0,1,main]start
+1end
+```
+
+## join()
+- 동시에 두 개 이상의 Thread가 실행될 때 다른 Thread의 결과를 참조하여 실행해야 하는 경우 join() 함수를 사용합니다.
+- join() 함수를 호출한 Thread가 not-runnable 상태로 갑니다.
+- 다른 Thread의 수행이 끝나면 runnable 상태로 돌아옵니다.
+
+이미지
+
+- 1부터 50, 51부터 100까지의 합을 구하는 두 개의 Thread를 만들어 그 결과를 확인
+
+```java
+public class JoinTest extends Thread {
+
+	int start;
+	int end;
+	int total;
+	// 특별히 초기화하지 않아도 기본값 0으로 초기화됨. 이유는 멤버 변수이기 때문이다. 지역변수일 경우에는 반드시 초기화 해야함.
+	
+	public JoinTest(int start, int end) {
+		this.start = start;
+		this.end = end;
+	}
+	
+	public void run() {
+		int i;
+		for(i = start; i <= end; i++) {
+			total += i;
+		}
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(Thread.currentThread() + "start");
+		JoinTest jt1 = new JoinTest(1, 50);
+		JoinTest jt2 = new JoinTest(51, 100);
+		
+		jt1.start();
+		jt2.start();
+		
+		try {
+			jt1.join();
+			jt2.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		int lastTotal = jt1.total + jt2.total;
+		
+		System.out.println("jt1.total = " + jt1.total);
+		System.out.println("jt2.total = " + jt2.total);
+		System.out.println("lastTotal = " + lastTotal);
+
+		System.out.println(Thread.currentThread() + "end");
+//		main, jt1, jt2 3개의 Thread가 돌아가는 상태.
+//		main은 jt1, jt2 Thread를 생성하고 start함.
+//		lastTotal을 확인을 할때에는 jt1, jt2가 끝나지 않은 상태.
+//		즉, lastTotal에 두개의 total값을 더하는 명령을 수행할때 더한 값을 출력.
+//		이 값은 출력할때마다 바뀔 수 있음.
+//		main이 필요한 것은 jt1, jt2의 결과다.
+//		그래서 main이 도는 동안 join을 건다.
+//		join을 걸면 main은 수행을 하지않는다. join걸고 끝날때까지 not runnable상태로 빠지기때문에 기다린다.
+	}
+
+}
+```
+
+## interrupt()
+- 다른 Thread에 예외를 발생시키는 interrupt를 보냅니다.
+- Thread가 join(), sleep(), wait() 함수에 의해 not-runnable 상태일 때 interrupt() 메서드를 호출하면 다시 runnable 상태가 될 수 있습니다.
+
+## Thread 종료하기
+- Thread를 종료할 때 사용합니다.
+- 무한 반복의 경우 while(flag)의 flag 변수 값을 false로 바꾸어 종료를 시킵니다.
+- Thread 종료하기 예제
+
+```textarea
+새 개의 thread를 만듭니다.
+각각 무한 루프를 수행하게 합니다.
+작업 내용 this.sleep(100);
+
+'A'를 입력 받으면 첫 번째 thread를
+'B'를 입력 받으면 두 번째 thread를
+'C'를 입력 받으면 세 번째 thread를
+'M'을 입력 받으면 모든 thread와 main() 함수를 종료합니다.
+```
+
+```java
+import java.io.IOException;
+
+public class TerminateThread extends Thread{
+
+	private boolean flag = false;
+	int i;
+	
+	public TerminateThread(String name){
+		super(name);
+	}
+	
+	public void run(){
+		
+		
+		while(!flag){
+			try {
+				sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		System.out.println( getName() + " end" );
+		
+	}
+	
+	public void setFlag(boolean flag){
+		this.flag = flag;
+	}
+	
+	
+	public static void main(String[] args) throws IOException {
+
+		TerminateThread threadA = new TerminateThread("A");
+		TerminateThread threadB = new TerminateThread("B");
+		TerminateThread threadC = new TerminateThread("C");
+		
+		threadA.start();
+		threadB.start();
+		threadC.start();
+		
+		int in;
+		while(true) {
+			in = System.in.read();
+			if ( in == 'A'){
+				threadA.setFlag(true);
+			} else if(in == 'B'){
+				threadB.setFlag(true);
+			} else if( in == 'C'){
+				threadC.setFlag(true);
+			} else if( in == 'M'){
+				threadA.setFlag(true);
+				threadB.setFlag(true);
+				threadC.setFlag(true);
+				break;
+			} else{
+				System.out.println("type again");
+			}
+		}
+		
+		System.out.println("main end");
+		
+	}
+
+}
+```
 
 
 
