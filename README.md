@@ -8637,7 +8637,7 @@ Thread[Thread-0,1,main]start
 - join() 함수를 호출한 Thread가 not-runnable 상태로 갑니다.
 - 다른 Thread의 수행이 끝나면 runnable 상태로 돌아옵니다.
 
-이미지
+[!img27](./src/img/img27.png)
 
 - 1부터 50, 51부터 100까지의 합을 구하는 두 개의 Thread를 만들어 그 결과를 확인
 
