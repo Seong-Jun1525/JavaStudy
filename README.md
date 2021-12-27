@@ -8140,17 +8140,378 @@ public class SerializationTest {
 Lim, 왕
 ```
 
+# 그 외 여러가지 입출력 클래스들
+## File 클래스
+- 파일 개념을 추상화한 클래스
+- 입출력 기능은 없고, 파일의 이름, 경로, 읽기 전용 등의 속성을 알 수 있습니다.
+- 이를 지원하는 여러 메서드들이 제공됩니다.
+
+```java
+import java.io.File;
+import java.io.IOException;
+
+public class FileTest {
+
+	public static void main(String[] args) throws IOException {
+
+		File file = new File("C:\\Users\\hi5k1\\Desktop\\Seong-Jun\\Java-Study\\JavaStudy\\newFile.txt"); // 파일은 없어도 디렉토리 경로는 있어야함.
+		file.createNewFile();
+		
+		System.out.println(file.isFile());
+		System.out.println(file.isDirectory());
+		System.out.println(file.getName());
+		System.out.println(file.getAbsolutePath());
+		System.out.println(file.getPath());
+		System.out.println(file.canRead());
+		System.out.println(file.canWrite());
+		
+		file.delete();
+	}
+}
+```
+
+## RandomAccessFile 클래스
+- 입출력 클래스 중 유일하게 파일에 대한 입력과 출력을 동시에 할 수 있는 클래스
+- 파일 포인터가 있어서 읽고 쓰는 위치의 이동이 가능합니다.
+- 다양한 메서드가 제공됩니다.
+- 중간중간 어느 부분으로 이동을 해서 읽거나 쓰는 용도로 사용합니다.
+
+```java
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
+public class RandomAccessFileTest {
+
+	public static void main(String[] args) throws IOException {
+		RandomAccessFile rf = new RandomAccessFile("random.txt", "rw");
+		
+		rf.writeInt(100);
+		System.out.println("pos: " + rf.getFilePointer());
+		rf.writeDouble(3.14);
+		System.out.println("pos: " + rf.getFilePointer());
+		rf.writeUTF("안녕하세요"); // 한 글자당 3byte 즉, 3*5 = 15 마지막에 null이 있다 null이 2byte 그래서 17이다. 12 + 17은 29
+		System.out.println("pos: " + rf.getFilePointer());
+		
+		rf.seek(0);
+		
+		int i = rf.readInt();
+		double d = rf.readDouble();
+		String str = rf.readUTF();
+		
+		System.out.println(i);
+		System.out.println(d);
+		System.out.println(str);
+	}
+
+}
+```
+
+# 데코레이터 패턴을 활용한 커피 머신 프로그램
+## Decorator Pattern
+- 자바의 입출력 스트림은 decorator pattern입니다.
+- 여러 decorator들을 활용하여 다양한 기능을 제공합니다.
+- 상속보다 유연한 구현 방식입니다.
+- 데코레이터는 다른 데코레이터나 또는 컴포넌트를 포함해야합니다.
+- 지속적인 기능의 추가와 제거가 용이합니다.
+- decorator와 component는 동일한 것이 아닙니다. (기반 스트림 클래스가 직접 읽고 쓸 수 있습니다. 보조 스트림은 추가적인 기능을 제공합니다.)
+
+![img25](./src/img/img25.png)
+
+```textarea
+Decorator Pattern을 활용하여 커피 만들기
+
+아메리카노
+
+카페라떼 = 아메리카노 + 우유
+
+모카커피 = 아메리카노 + 우유 + 모카시럽
+
+크림 올라간 모카커피 = 아메리카노 + 우유 + 모카시럽 + whipping cream
+
+커피 = 컴포넌트
+
+우유, 모카시럽, whipping cream = decorator
+```
+
+## 예제
+### Coffee.java
+```java
+public abstract class Coffee {
+	public abstract void brewing();
+}
+```
+
+### EtiopiaAmericano.java
+```java
+public class EtiopiaAmericano extends Coffee {
+
+	@Override
+	public void brewing() {
+		System.out.print("EtiopiaAmericano");
+	}
+
+}
+```
+
+### Decorator.java
+```java
+public abstract class Decorator extends Coffee {
+	
+	Coffee coffee;
+	public Decorator(Coffee coffee) {
+		this.coffee = coffee;
+	}
+
+	@Override
+	public void brewing() {
+		coffee.brewing();
+	}
+
+}
+```
+
+### Latte.java
+```java
+public class Latte extends Decorator {
+
+	public Latte(Coffee coffee) {
+		// 상위 클래스에서 Default constructor가 없으면
+		// 하위 클래스는 반드시 매개변수가 있는 constructor가 super를 명시적으로 호출해야함. 
+		super(coffee);
+	}
+
+	public void brewing() {
+		super.brewing();
+		System.out.print(" Adding Milk");
+	}
+}
+```
+
+### Mocha.java
+```java
+public class Mocha extends Decorator {
+
+	public Mocha(Coffee coffee) {
+		super(coffee);
+	}
+	
+	public void brewing() {
+		super.brewing();
+		System.out.print(" Adding Mocha syrup");
+	}
+
+}
+```
+
+### KeyaAmericano.java
+```java
+public class KeyaAmericano extends Coffee {
+
+	@Override
+	public void brewing() {
+		System.out.print("Keya Americano");
+	}
+
+}
+```
+
+### WhippingCream.java
+```java
+public class WhippingCream extends Decorator {
+
+	public WhippingCream(Coffee coffee) {
+		super(coffee);
+	}
+
+	public void brewing() {
+		super.brewing();
+		System.out.print(" Adding Whipping Cream");
+	}
+}
+```
+
+### CoffeeTest.java
+```java
+public class CoffeeTest {
+
+	public static void main(String[] args) {
+		Coffee etiopiaCoffee = new EtiopiaAmericano();
+		etiopiaCoffee.brewing();
+		
+		System.out.println();
+		
+		Coffee etiopiaLatte = new Latte(etiopiaCoffee);
+		etiopiaLatte.brewing();
+		
+		System.out.println();
+		
+		Coffee mochaEtiopia = new Mocha(new Latte(new EtiopiaAmericano()));
+		mochaEtiopia.brewing();
+		
+		System.out.println();
+		
+		Coffee keyaCoffee = new WhippingCream(new Mocha(new Latte(new KeyaAmericano())));
+		keyaCoffee.brewing();
+	}
+
+}
+```
+
+### 출력 결과
+```console
+EtiopiaAmericano
+EtiopiaAmericano Adding Milk
+EtiopiaAmericano Adding Milk Adding Mocha syrup
+Keya Americano Adding Milk Adding Mocha syrup Adding Whipping Cream
+```
+
+# 자바에서 Thread 만들기
+## Thread란?
+- process : 실행 중인 프로그램이 실행되면 OS로 부터 메모리를 할당받아 프로세스 상태가 됩니다.
+- thread : 하나의 프로세스는 하나 이상의 thread를 가지게 되고, 실제 작업을 수행하는 단위는 thread입니다.
+
+## multi-threading
+- 여러 thread가 동시에 수행되는 프로그래밍, 여러 작업이 동시에 실행되는 효과
+- thread는 각각 자신만의 작업 공간을 가집니다. (context)
+- 각 thread 사이에서 공유하는 자원이 있을 수 있습니다. (자바에서는 static instance)
+- 여러 thread가 자원을 공유하여 작업이 수행되는 경우 서로 자원을 차지하려는 race condition이 발생할 수 있습니다.
+- 이렇게 여러 thread가 공유하는 자원 중 경쟁이 발생하는 부분을 crtical section 이라고 합니다.
+- critical section에 대한 동기화(일종의 순차적 수행)를 구현하지 않으면 오류가 발생할 수 있습니다.
 
 
+## Thread 만들기
+```java
+class MyThread extends Thread {
+	public void run() {
+		int i;
+		
+		for(i = 1; i <= 200; i++) {
+			System.out.print(i + " ");
+		}
+	}
+}
 
+public class ThreadTest {
 
+	public static void main(String[] args) {
+		
+		System.out.println(Thread.currentThread() + "start");
+		
+		MyThread th1 = new MyThread();
+		MyThread th2 = new MyThread();
+		
+		th1.start();
+		th2.start();
+		
+		System.out.println(Thread.currentThread() + "end");
+		
+//		총 3개의 스레드가 돌아감.
+//		main, th1, th2
+//		main Thread는 Thread 2개 생성하고 start하고 end
+		
+		
+	}
 
+}
+```
 
+### 출력 결과
+```console
+Thread[main,5,main]start
+Thread[main,5,main]end
+1 2 3 4 5 6 7 8 1 9 2 10 3 11 4 12 5 13 6 14 7 15 8 16 9 17 10 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 11 39 40 41 12 42 13 43 14 44 15 45 16 17 18 19 20 21 22 23 24 46 25 47 26 48 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 110 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 111 112 113 114 115 116 117 118 119 120 121 122 123 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200
+```
 
+### 이미 다른 것을 extends 했을 경우(Runnable 인터페이스 구현하여 만들기)
+- 자바는 다중 상속이 허용되지 않으므로 이미 다른 클래스를 상속한 경우 thread를 만들기 위해 Runnable interface를 구현해서 만듭니다.
+```java
+class MyThread implements Runnable {
 
+	@Override
+	public void run() {
+		int i;
+		
+		for(i = 1; i <= 200; i++) {
+			System.out.print(i + " ");
+		}
+	}
+	
+}
 
+public class ThreadTest {
 
+	public static void main(String[] args) {
+		
+		System.out.println(Thread.currentThread() + "start");
+		
+		MyThread runnable = new MyThread();
+		
+		Thread th1 = new Thread(runnable);
+		Thread th2 = new Thread(runnable);
+		
+		th1.start();
+		th2.start();
+		
+		System.out.println(Thread.currentThread() + "end");
+	}
 
+}
+```
+
+### 또 다른 방법
+```java
+class MyThread implements Runnable {
+
+	@Override
+	public void run() {
+		int i;
+		
+		for(i = 1; i <= 200; i++) {
+			System.out.print(i + " ");
+		}
+	}
+	
+}
+
+public class ThreadTest {
+
+	public static void main(String[] args) {
+		
+		System.out.println(Thread.currentThread() + "start");
+		
+		MyThread runnable = new MyThread();
+		
+		Thread th1 = new Thread(runnable);
+		Thread th2 = new Thread(runnable);
+		
+		th1.start();
+		th2.start();
+		
+		System.out.println(Thread.currentThread() + "end");
+		// 간단하게 돌리는 방법
+		Runnable run = new Runnable() {
+			@Override
+			public void run() {
+				System.out.println("run");
+			}
+		};
+		
+		run.run();
+		
+	}
+
+}
+```
+
+### 출력 결과
+```console
+Thread[main,5,main]start
+Thread[main,5,main]end
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 run
+15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200
+```
+
+![img26](./src/img/img26.png)
 
 
 
