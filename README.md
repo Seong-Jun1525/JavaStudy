@@ -8908,7 +8908,97 @@ synchronized(참조형 수식) {
 [!img29](./scr/img/img29.png)
 
 
+# wait() / notify() 메서드를 활용한 동기화 프로그래밍
+- 리소스가 어떤 조건에서 더 이상 유효하지 않은 경우 리소스를 기다리기 위해 Thread가 wait()상태가 됩니다.
+- wait() 상태가 된 Thread는 notify()가 호출 될 때까지 기다립니다.
+- 유효한 자원이 생기면 notify()가 호출되고 wait()하고 있는 Thread 중 무작위로 하나의 Thread를 재시작하도록 합니다.
+- notifyAll()이 호출되는 경우 wait()하고 있는 모든 Thread가 재시작 됩니다.
+- 이 경우 유효한 리소스만큼의 Thread만이 수행될 수 있고 자원을 갖지 못한 Thread의 경우는 다시 wait() 상태로 만듭니다.
+- 자바에서는 notifyAll() 메서드의 사용을 권장합니다.
+- 도서관에서 책을 빌리는 예제
 
+## notify()를 사용하는 경우
+```java
+import java.util.ArrayList;
+
+class FastLibrary {
+	public ArrayList<String> shelf = new ArrayList<>();
+	
+	public FastLibrary() {
+		shelf.add("book1");
+		shelf.add("book2");
+		shelf.add("book3");
+	}
+	
+	public synchronized String lendBook() throws InterruptedException {
+		Thread t = Thread.currentThread();
+		
+		while(shelf.size() == 0) {
+			System.out.println(t.getName() + " waiting start");
+			wait(); // throws해도 되는 이유는 사용하는 곳에서 InterruptedException을 핸들링하고 있기 때문이다.
+			System.out.println(t.getName() + " waiting end");
+		}
+		
+		if(shelf.size() > 0) {
+			String book = shelf.remove(0);
+			System.out.println(t.getName() + ":" + book + " lend.");
+			return book;
+		}
+		else return null;
+	}
+	
+	public synchronized void returnBook(String book) {
+		Thread t = Thread.currentThread();
+		
+		shelf.add(book);
+//		notify();
+		notifyAll(); // 권장
+		System.out.println(t.getName() + ":" + book + " return.");
+	}
+}
+
+class Student extends Thread {
+	
+	public Student(String name) {
+		super(name);
+	}
+	public void run() {
+		try {
+			String title = LibraryMain.library.lendBook();
+			
+			if(title == null) {
+				System.out.println(getName() + "빌리지 못했습니다.");
+				return;
+			}
+			sleep(5000);
+			LibraryMain.library.returnBook(title);
+		} catch (InterruptedException e) {
+			System.out.println(e);
+		}
+		
+	}
+}
+
+public class LibraryMain {
+
+	public static FastLibrary library = new FastLibrary();
+	
+	public static void main(String[] args) {
+		Student std1 = new Student("std1 ");
+		Student std2 = new Student("std2 ");
+		Student std3 = new Student("std3 ");
+		Student std4 = new Student("std4 ");
+		Student std5 = new Student("std5 ");
+		
+		std1.start();
+		std2.start();
+		std3.start();
+		std4.start();
+		std5.start();
+	}
+
+}
+```
 
 
 
